@@ -1,0 +1,9 @@
+{# Utilise les classes Bootstrap/Ceres sur les widgets #}
+{% block form_row %}
+  <div class="mb-6">
+    {{- form_label(form, null, {'label_attr': {'class':'form-label fw-semibold'}}) -}}
+    {{- form_widget(form, {'attr': {'class': (attr.class|default('')) ~ ' form-control form-control-solid'}}) -}}
+    {{- form_errors(form) -}}
+    {% if help is defined and help %}<div class="form-text">{{ help|raw }}</div>{% endif %}
+  </div>
+{% endblock %}

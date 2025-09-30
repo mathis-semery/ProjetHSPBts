@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Auth · GDH{% endblock %}</title>
+    {% include 'partials/_head_assets.html.twig' %}
+    {% block stylesheets %}{% endblock %}
+</head>
+<body id="kt_body" class="app-blank">
+<div class="d-flex flex-column flex-root">
+    {% block body %}{% endblock %}
+</div>
+{% include 'partials/_scripts_assets.html.twig' %}
+{% block javascripts %}{% endblock %}
+</body>
+</html>

@@ -46,7 +46,7 @@ class RegistrationController extends AbstractController
             $url = $this->generateUrl('app_verify_account', ['token' => $token], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
 
             $emailMessage = (new Email())
-                ->from('clashofclan93440@gmail.com')
+                ->from('tonemail.com')
                 ->to($user->getEmail())
                 ->subject('Validez votre compte')
                 ->html("<p>Bonjour {$user->getPrenom()},</p>

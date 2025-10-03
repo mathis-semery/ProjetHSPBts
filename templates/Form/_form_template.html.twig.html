@@ -1,0 +1,108 @@
+{# templates/form/_form_template.html.twig - VERSION SIMPLIFIEE #}
+<div class="form-template {% if isAdmin is defined and isAdmin %}admin-version{% endif %}">
+    <div class="form-header">
+        <h2>{{ form_title|default('Formulaire') }}</h2>
+        {% if form_subtitle is defined %}
+        <p class="text-muted">{{ form_subtitle }}</p>
+        {% endif %}
+    </div>
+
+    {{ form_start(form, {'attr': {'class': 'custom-form'}}) }}
+
+    <div class="form-fields">
+        {% for field in form %}
+        {% if field.vars.name != '_token' %}
+        <div class="form-group">
+            {# Laisser Symfony gérer tout le rendu #}
+            {{ form_row(field, {
+            'attr': {'class': 'form-input'},
+            'label_attr': {'class': 'form-label'},
+            'row_attr': {'class': 'form-row'}
+            }) }}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+            {{ submit_label|default('Valider') }}
+        </button>
+
+        {% if cancel_url is defined %}
+        <a href="{{ cancel_url }}" class="btn btn-secondary">Annuler</a>
+        {% endif %}
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<style>
+    /* Le même CSS que précédemment */
+    .form-template {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .form-template.admin-version {
+        border-left: 4px solid #dc3545;
+        background: #f8f9fa;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+</style>

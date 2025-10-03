@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Hopital{% endblock %}
+
+{% block body %}
+    <h1>Create new Hopital</h1>
+
+    {{ include('hopital/_form.html.twig') }}
+
+    <a href="{{ path('app_hopital_index') }}">back to list</a>
+{% endblock %}

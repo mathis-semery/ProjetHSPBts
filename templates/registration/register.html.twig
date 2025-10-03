@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Créer un compte</h1>
+
+        <div class="flash-messages">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+        </div>
+
+        <form method="POST" action="{{ path('app_register') }}">
+            <div class="mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text" name="nom" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Prénom</label>
+                <input type="text" name="prenom" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Métier</label>
+                <input type="text" name="metier" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Formation</label>
+                <input type="text" name="formation" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Spécialité</label>
+                <input type="text" name="specialite" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Poste occupé</label>
+                <input type="text" name="poste_occupe" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">CV</label>
+                <input type="text" name="cv" class="form-control">
+            </div>
+
+            <button type="submit" class="btn btn-primary">S'inscrire</button>
+        </form>
+    </div>
+{% endblock %}

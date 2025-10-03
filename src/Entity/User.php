@@ -151,7 +151,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $verificationToken = null;
 
+    public function getVerificationToken(): ?string
+    {
+        return $this->verificationToken;
+    }
+
+    public function setVerificationToken(?string $token): self
+    {
+        $this->verificationToken = $token;
+        return $this;
+    }
+
+    public function getEtatValidation(): bool
+    {
+        return $this->etat_validation;
+    }
+
+    public function setEtatValidation(bool $etat): self
+    {
+        $this->etat_validation = $etat;
+        return $this;
+    }
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -225,12 +248,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->etat_validation;
     }
 
-    public function setEtatValidation(?bool $etat_validation): static
-    {
-        $this->etat_validation = $etat_validation;
-
-        return $this;
-    }
 
     public function getDateCreation(): ?\DateTime
     {
@@ -445,6 +462,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+
         return $this;
     }
+
+
 }

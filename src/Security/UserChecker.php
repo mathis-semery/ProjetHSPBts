@@ -11,7 +11,7 @@ class UserChecker implements UserCheckerInterface
     public function checkPreAuth(UserInterface $user): void
     {
 
-        if (!$user->getEtatValidation()) {
+        if ($user->getVerificationToken()) {
             throw new CustomUserMessageAuthenticationException(
                 'Vous devez valider votre email avant de vous connecter.'
             );

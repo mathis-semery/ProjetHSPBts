@@ -31,7 +31,7 @@ class RegistrationController extends AbstractController
             $user->setCv($request->request->get('cv'));
             $user->setDateCreation(new \DateTime());
             $user->setEtatValidation(false);
-            $user->setRoles(['ROLE_USER']);
+            $user->setRoles(['ROLE_ATTENTE_VERIFICATION']);
 
             $hashedPassword = $passwordHasher->hashPassword($user, $request->request->get('password'));
             $user->setPassword($hashedPassword);
@@ -75,8 +75,8 @@ class RegistrationController extends AbstractController
         }
 
 
-        $user->setEtatValidation(true);
         $user->setVerificationToken(null); // Le token est utilisé et doit être effacé
+        $user->setRoles(['ROLE_ATTENTE_VERIFICATION']);
 
 
         $entityManager->flush();

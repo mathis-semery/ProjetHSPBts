@@ -28,3 +28,9 @@ security:
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        # ROLE_ATTENTE : n'a accès qu'à /attente
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY, allow_if: "!is_granted('ROLE_ATTENTE') or request.pathInfo matches '^/attente$'" }
+
+        # ROLE_ATTENTE_VERIFICATION : n'a accès qu'à /login et /register
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY, allow_if: "!is_granted('ROLE_ATTENTE_VERIFICATION') or request.pathInfo matches '^/(login|register)$'" }
+

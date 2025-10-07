@@ -51,13 +51,13 @@ class RegistrationController extends AbstractController
                 ->subject('Validez votre compte')
                 ->html("<p>Bonjour {$user->getPrenom()},</p>
                     <p>Veuillez valider votre compte en cliquant sur ce lien :</p>
-                    <a href='http://localhost:8000/verify/{$token}'>Valider mon compte</a>");
+                    <a href='http://{$this->getParameter('nom_domaine')}/verify/{$token}'>Valider mon compte</a>");
 
             $mailer->send($emailMessage);
-
             $this->addFlash('success', 'Votre compte a été créé. Un email de confirmation a été envoyé.');
             return $this->redirectToRoute('app_login');
         }
+        dump();
 
         return $this->render('registration/register.html.twig');
     }

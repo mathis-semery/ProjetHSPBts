@@ -1,67 +1,78 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/auth_base.html.twig' %}
 
-{% block title %}Inscription{% endblock %}
+{% block title %}Inscription · {{ parent() }}{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <h1>Créer un compte</h1>
-
-        <div class="flash-messages">
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success">{{ message }}</div>
-            {% endfor %}
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger">{{ message }}</div>
-            {% endfor %}
+    <div class="d-flex flex-column flex-lg-row flex-column-fluid">
+        {# Colonne visuelle à gauche (cache sur mobile) #}
+        <div class="d-none d-lg-flex w-lg-50 bg-body flex-center">
+            <img src="{{ asset('assets/media/illustrations/dozzy-1/4.png') }}" alt="" class="mw-100" style="max-height:360px;">
         </div>
 
-        <form method="POST" action="{{ path('app_register') }}">
-            <div class="mb-3">
-                <label class="form-label">Nom</label>
-                <input type="text" name="nom" class="form-control" required>
-            </div>
+        {# Colonne formulaire #}
+        <div class="d-flex w-100 w-lg-50 flex-center p-10">
+            <div class="card shadow-sm w-100" style="max-width:520px;">
+                <div class="card-body p-10">
 
-            <div class="mb-3">
-                <label class="form-label">Prénom</label>
-                <input type="text" name="prenom" class="form-control" required>
-            </div>
+                    <h1 class="mb-7">Créer un compte</h1>
 
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
+                    {# messages flash #}
+                    <div class="mb-6">
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success">{{ message }}</div>
+                        {% endfor %}
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger">{{ message }}</div>
+                        {% endfor %}
+                    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
+                    <form method="post" action="{{ path('app_register') }}" class="form w-100">
+                        <div class="mb-7">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" name="nom" required autocomplete="family-name"
+                                   class="form-control form-control-lg form-control-solid">
+                        </div>
 
-            <div class="mb-3">
-                <label class="form-label">Métier</label>
-                <input type="text" name="metier" class="form-control" required>
-            </div>
+                        <div class="mb-7">
+                            <label class="form-label">Prénom *</label>
+                            <input type="text" name="prenom" required autocomplete="given-name"
+                                   class="form-control form-control-lg form-control-solid">
+                        </div>
 
-            <div class="mb-3">
-                <label class="form-label">Formation</label>
-                <input type="text" name="formation" class="form-control">
-            </div>
+                        <div class="mb-7">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" required autocomplete="email"
+                                   class="form-control form-control-lg form-control-solid">
+                        </div>
 
-            <div class="mb-3">
-                <label class="form-label">Spécialité</label>
-                <input type="text" name="specialite" class="form-control">
-            </div>
+                        <div class="mb-7">
+                            <label class="form-label">Métier *</label>
+                            <select name="metier" required
+                                    class="form-select form-select-lg form-select-solid">
+                                <option value="" selected disabled>Choisir un métier…</option>
+                                <option value="ETUDIANT">Étudiant</option>
+                                <option value="MEDECIN">Médecin</option>
+                                <option value="PARTENAIRE">Partenaire</option>
+                            </select>
+                        </div>
 
-            <div class="mb-3">
-                <label class="form-label">Poste occupé</label>
-                <input type="text" name="poste_occupe" class="form-control">
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">CV</label>
-                <input type="text" name="cv" class="form-control">
-            </div>
+                        <div class="mb-7">
+                            <label class="form-label">Mot de passe *</label>
+                            <input type="password" name="password" required minlength="6" autocomplete="new-password"
+                                   class="form-control form-control-lg form-control-solid">
+                            <div class="form-text">6 caractères minimum</div>
+                        </div>
 
-            <button type="submit" class="btn btn-primary">S'inscrire</button>
-        </form>
+                        <button type="submit" class="btn btn-primary w-100">S’inscrire</button>
+                    </form>
+
+                    <div class="text-center text-muted fs-7 mt-6">
+                        Déjà inscrit ? <a href="{{ path('app_login') }}" class="link-primary">Se connecter</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

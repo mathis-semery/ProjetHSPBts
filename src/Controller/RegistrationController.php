@@ -30,7 +30,6 @@ class RegistrationController extends AbstractController
             $user->setPosteOccupe($request->request->get('poste_occupe'));
             $user->setCv($request->request->get('cv'));
             $user->setDateCreation(new \DateTime());
-            $user->setEtatValidation(false);
             $user->setRoles(['ROLE_ATTENTE_VERIFICATION']);
 
             $hashedPassword = $passwordHasher->hashPassword($user, $request->request->get('password'));

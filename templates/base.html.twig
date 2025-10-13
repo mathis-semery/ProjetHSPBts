@@ -9,9 +9,16 @@
 </head>
 <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled">
   {% include 'partials/_header.html.twig' %}
-  <main id="main">
-    {% block body %}{% endblock %}
+  <main id="main" class="bg-light">
+      <div class="container-xxl py-8">
+          <div class="card shadow-sm border-0 rounded-3">
+              <div class="card-body p-6 p-lg-10">
+                  {% block body %}{% endblock %}
+              </div>
+          </div>
+      </div>
   </main>
+
   {% include 'partials/_footer.html.twig' %}
   {% include 'partials/_scripts_assets.html.twig' %}
   {% block javascripts %}{% endblock %}

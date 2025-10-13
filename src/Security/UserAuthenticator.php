@@ -44,13 +44,26 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $roles = $token->getRoleNames();
+
+        // 1) Si l'utilisateur est encore en attente de validation admin,
+        // on l'envoie systématiquement sur la page d'attente (prioritaire).
+        if (\in_array('ROLE_ATTENTE_VERIFICATION', $roles, true)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_attente_verification'));
+        }
+
+        // (Optionnel) autre rôle de quarantaine
+        if (\in_array('ROLE_ATTENTE', $roles, true)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_attente'));
+        }
+
+        // 2) Sinon, s'il y a une URL mémorisée (ex: page protégée visitée avant login), on y retourne.
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        // For example:
-        // return new RedirectResponse($this->urlGenerator->generate('some_route'));
-        return new RedirectResponse($this->urlGenerator->generate('app_register'));
+        // 3) Fallback : page d'accueil (adapte le nom de route si besoin)
+        return new RedirectResponse($this->urlGenerator->generate('app_home'));
     }
 
     protected function getLoginUrl(Request $request): string

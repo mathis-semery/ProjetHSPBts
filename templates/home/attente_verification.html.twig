@@ -1,0 +1,43 @@
+{% extends 'layouts/auth_base.html.twig' %}
+{% block title %}En attente de validation · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="d-flex flex-column flex-lg-row flex-column-fluid">
+        <!-- Colonne visuelle (comme login) -->
+        <div class="d-none d-lg-flex w-lg-50 bg-body flex-center">
+            <img src="{{ asset('assets/media/illustrations/dozzy-1/1.png') }}"
+                 alt="" class="mw-100" style="max-height: 360px;">
+        </div>
+
+        <!-- Colonne contenu -->
+        <div class="d-flex w-100 w-lg-50 flex-center p-10">
+            <div class="card shadow-sm w-100" style="max-width:480px; font-size:11pt;">
+                <div class="card-body p-10">
+                    <div class="mb-7" style="font-size:18px;">Compte en attente de validation</div>
+
+                    <div class="alert alert-warning">
+                        Ta demande de confirmation a bien été envoyée. Un administrateur doit valider ton compte.
+                    </div>
+
+                    <div class="mb-6 text-gray-700">
+                        {% if createdAt %}
+                            <div>Créé le {{ createdAt|date('d/m/Y H:i') }}</div>
+                            <div>En attente depuis : {{ since }}</div>
+                        {% else %}
+                            <div>Date de création : inconnue</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_attente_verification') }}" class="btn btn-light">Rafraîchir</a>
+                        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger ms-auto">Se déconnecter</a>
+                    </div>
+
+                    <p class="text-muted mt-6" style="font-size:10pt;">
+                        Si tu viens d’être validé, reconnecte-toi pour mettre à jour tes droits.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

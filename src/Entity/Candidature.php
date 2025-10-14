@@ -19,6 +19,12 @@ class Candidature
     #[ORM\Column(nullable: true)]
     private ?bool $etat = null;
 
+    #[ORM\ManyToOne(inversedBy: 'candidatures')]
+    private ?User $refUser = null;
+
+    #[ORM\ManyToOne(inversedBy: 'candidatures')]
+    private ?Offre $refOffre = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +50,30 @@ class Candidature
     public function setEtat(?bool $etat): static
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getRefUser(): ?User
+    {
+        return $this->refUser;
+    }
+
+    public function setRefUser(?User $refUser): static
+    {
+        $this->refUser = $refUser;
+
+        return $this;
+    }
+
+    public function getRefOffre(): ?Offre
+    {
+        return $this->refOffre;
+    }
+
+    public function setRefOffre(?Offre $refOffre): static
+    {
+        $this->refOffre = $refOffre;
 
         return $this;
     }

@@ -103,6 +103,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->canals = new ArrayCollection();
         $this->posts = new ArrayCollection();
         $this->inscriptions = new ArrayCollection();
+        $this->candidatures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -155,6 +156,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $verificationToken = null;
+
+    /**
+     * @var Collection<int, Candidature>
+     */
+    #[ORM\OneToMany(targetEntity: Candidature::class, mappedBy: 'refUser')]
+    private Collection $candidatures;
 
     public function getVerificationToken(): ?string
     {
@@ -464,6 +471,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Candidature>
+     */
+    public function getCandidatures(): Collection
+    {
+        return $this->candidatures;
+    }
+
+    public function addCandidature(Candidature $candidature): static
+    {
+        if (!$this->candidatures->contains($candidature)) {
+            $this->candidatures->add($candidature);
+            $candidature->setRefUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCandidature(Candidature $candidature): static
+    {
+        if ($this->candidatures->removeElement($candidature)) {
+            // set the owning side to null (unless already changed)
+            if ($candidature->getRefUser() === $this) {
+                $candidature->setRefUser(null);
+            }
+        }
 
         return $this;
     }

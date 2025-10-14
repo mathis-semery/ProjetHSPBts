@@ -36,7 +36,7 @@ final class ReponseController extends AbstractController
             return $this->redirectToRoute('app_reponse_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('reponse/register.html.twig', [
+        return $this->render('reponse/new.html.twig', [
             'reponse' => $reponse,
             'form' => $form,
         ]);

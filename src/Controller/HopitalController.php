@@ -36,7 +36,7 @@ final class HopitalController extends AbstractController
             return $this->redirectToRoute('app_hopital_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('hopital/register.html.twig', [
+        return $this->render('hopital/new.html.twig', [
             'hopital' => $hopital,
             'form' => $form,
         ]);

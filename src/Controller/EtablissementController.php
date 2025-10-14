@@ -36,7 +36,7 @@ final class EtablissementController extends AbstractController
             return $this->redirectToRoute('app_etablissement_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('etablissement/register.html.twig', [
+        return $this->render('etablissement/new.html.twig', [
             'etablissement' => $etablissement,
             'form' => $form,
         ]);

@@ -36,7 +36,7 @@ final class EvenementController extends AbstractController
             return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('evenement/register.html.twig', [
+        return $this->render('evenement/newregister.html.twig', [
             'evenement' => $evenement,
             'form' => $form,
         ]);

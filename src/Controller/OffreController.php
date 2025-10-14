@@ -36,7 +36,7 @@ final class OffreController extends AbstractController
             return $this->redirectToRoute('app_offre_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('offre/register.html.twig', [
+        return $this->render('offre/new.html.twig', [
             'offre' => $offre,
             'form' => $form,
         ]);

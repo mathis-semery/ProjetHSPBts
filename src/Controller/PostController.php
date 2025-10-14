@@ -36,7 +36,7 @@ final class PostController extends AbstractController
             return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('post/register.html.twig', [
+        return $this->render('post/new.html.twig', [
             'post' => $post,
             'form' => $form,
         ]);

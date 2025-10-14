@@ -1,0 +1,59 @@
+{# templates/user_pending/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateurs en attente{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Utilisateurs en attente de validation</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+
+        {% if users is empty %}
+            <div class="alert alert-info">Aucun utilisateur en attente.</div>
+        {% else %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Métier</th>
+                    <th>Inscrit le</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.nom }}</td>
+                        <td>{{ user.prenom }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.metier ?? '—' }}</td>
+                        <td>{{ user.dateCreation ? user.dateCreation|date('d/m/Y') : '—' }}</td>
+                        <td>
+                            <form method="post" action="{{ path('user_pending_accept', {'id': user.id}) }}" style="display:inline;">
+                                <button type="submit" class="btn btn-success btn-sm"
+                                        onclick="return confirm('Accepter cet utilisateur ?');">
+                                    ✅ Accepter
+                                </button>
+                            </form>
+                            <form method="post" action="{{ path('user_pending_refuse', {'id': user.id}) }}" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Refuser cet utilisateur ? Un email sera envoyé.');">
+                                    ❌ Refuser
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

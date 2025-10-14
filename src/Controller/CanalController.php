@@ -36,7 +36,7 @@ final class CanalController extends AbstractController
             return $this->redirectToRoute('app_canal_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('canal/index.html.twig', [
+        return $this->render('canal/new.html.twig', [
             'canal' => $canal,
             'form' => $form,
         ]);

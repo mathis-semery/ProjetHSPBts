@@ -11,7 +11,10 @@
                 <th>Id</th>
                 <th>Lettre</th>
                 <th>Etat</th>
+                <th>Offre</th>
+                <th>Utilisateur</th>
                 <th>actions</th>
+
             </tr>
         </thead>
         <tbody>
@@ -20,6 +23,9 @@
                 <td>{{ candidature.id }}</td>
                 <td>{{ candidature.lettre }}</td>
                 <td>{{ candidature.etat ? 'Yes' : 'No' }}</td>
+                <td>{{ candidature.refOffre.type }}</td>
+                <td>{{ candidature.refUser.email }}</td>
+
                 <td>
                     <a href="{{ path('app_candidature_show', {'id': candidature.id}) }}">show</a>
                     <a href="{{ path('app_candidature_edit', {'id': candidature.id}) }}">edit</a>

@@ -27,10 +27,18 @@ security:
             user_checker: App\Security\UserChecker
 
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        # ROLE_ATTENTE_VERIFICATION : accès uniquement à /login, /register et /attente-verification
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY, allow_if: "!is_granted('ROLE_ATTENTE_VERIFICATION') or request.pathInfo matches '^/(attente-verification)$'" }
-
-        # ROLE_ATTENTE_VERIFICATION : n'a accès qu'à /login et /register
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY, allow_if: "!is_granted('ROLE_ATTENTE_VERIFICATION') or request.pathInfo matches '^/(login|register)$'" }
+        # Public
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/verify-email, roles: PUBLIC_ACCESS }
         - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+
+        # Admin
+        - { path: ^/admin, roles: ROLE_ADMIN }
+
+        # Pages autorisées aux comptes "en attente de vérification"
+        - { path: ^/verification$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/attente-verification$, roles: IS_AUTHENTICATED_FULLY }
+
+        # Tout le reste protégé
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

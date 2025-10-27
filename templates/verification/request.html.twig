@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+{% block title %}Vérification du compte{% endblock %}
+
+{% block body %}
+    <div class="container py-8">
+        {% for label, messages in app.flashes %}
+            {% for msg in messages %}
+                <div class="alert alert-{{ label }} mb-6">{{ msg }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <h2 class="mb-1">{{ page_title }}</h2>
+
+        {# Bloc consignes selon le métier #}
+        <div class="card mb-6">
+            <div class="card-body">
+                <h5 class="card-title mb-2">{{ guidance_title }}</h5>
+                <ul class="mb-0">
+                    {% for item in guidance_items %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="text-muted mb-6">
+            <strong>Limites :</strong>
+            ≤ 18&nbsp;Mo par fichier, et ≤ {{ raw_limit_mb|number_format(2, ',', ' ') }}&nbsp;Mo au total (≈ 25&nbsp;Mo email après encodage).
+        </div>
+
+        {{ form_start(form, { attr: { id: 'verify-form', enctype: 'multipart/form-data', novalidate: 'novalidate' } }) }}
+        <div class="row g-4">
+            <div class="col-12">
+                {{ form_row(form.attachments) }}
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+            <a href="{{ path('app_home') }}" class="btn btn-light">Annuler</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

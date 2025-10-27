@@ -1,57 +1,64 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User index{% endblock %}
+{% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block body %}
-    <h1>User index</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Utilisateurs</h1>
+        <a href="{{ path('app_user_new') }}" class="btn btn-primary">Créer un utilisateur</a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Password</th>
-                <th>Nom</th>
-                <th>Prenom</th>
-                <th>Metier</th>
-                <th>Etat_validation</th>
-                <th>DateCreation</th>
-                <th>Formation</th>
-                <th>Cv</th>
-                <th>Specialite</th>
-                <th>PosteOccupe</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-                <td>{{ user.password }}</td>
-                <td>{{ user.nom }}</td>
-                <td>{{ user.prenom }}</td>
-                <td>{{ user.metier }}</td>
-                <td>{{ user.etatValidation ? 'Yes' : 'No' }}</td>
-                <td>{{ user.dateCreation ? user.dateCreation|date('Y-m-d') : '' }}</td>
-                <td>{{ user.formation }}</td>
-                <td>{{ user.cv }}</td>
-                <td>{{ user.specialite }}</td>
-                <td>{{ user.posteOccupe }}</td>
-                <td>
-                    <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
-                    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="14">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('warning') %}
+        <div class="alert alert-warning">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
 
-    <a href="{{ path('app_user_new') }}">Create new</a>
+    {% if users|length == 0 %}
+        <div class="alert alert-info">Aucun utilisateur trouvé.</div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôles</th>
+                    <th>Validé</th>
+                    <th>Créé le</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.prenom }} {{ user.nom }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% for role in user.roles %}
+                                <span class="badge bg-{% if role == 'ROLE_ADMIN' %}danger{% else %}secondary{% endif %}">{{ role }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ user.etatValidation ? '✅' : '❌' }}</td>
+                        <td>{{ user.dateCreation ? user.dateCreation|date('d/m/Y') : '' }}</td>
+                        <td>
+                            <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-sm btn-outline-info">Voir</a>
+                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                            <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -26,13 +26,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
+     * @var list<string>
      */
     #[ORM\Column]
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var string
      */
     #[ORM\Column]
     private ?string $password = null;
@@ -97,6 +97,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Inscription::class, mappedBy: 'refUser', orphanRemoval: true)]
     private Collection $inscriptions;
 
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $verificationToken = null;
+
+    /**
+     * @var Collection<int, Candidature>
+     */
+    #[ORM\OneToMany(targetEntity: Candidature::class, mappedBy: 'refUser')]
+    private Collection $candidatures;
+
     public function __construct()
     {
         $this->reponses = new ArrayCollection();
@@ -119,13 +128,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
     /**
-     * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
     public function getUserIdentifier(): string
@@ -145,23 +151,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+    public function getRolesForForm(): array
+    {
+        return $this->roles;
+    }
+    public function setRolesForForm(array $roles): self
+    {
+        $this->roles = array_values(array_unique($roles));
+        return $this;
+    }
+
     /**
      * @param list<string> $roles
      */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
-    private ?string $verificationToken = null;
-
-    /**
-     * @var Collection<int, Candidature>
-     */
-    #[ORM\OneToMany(targetEntity: Candidature::class, mappedBy: 'refUser')]
-    private Collection $candidatures;
 
     public function getVerificationToken(): ?string
     {
@@ -174,7 +181,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEtatValidation(): bool
+    public function getEtatValidation(): ?bool
     {
         return $this->etat_validation;
     }
@@ -184,6 +191,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->etat_validation = $etat;
         return $this;
     }
+
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -195,18 +203,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
-    /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
-     */
     public function __serialize(): array
     {
         $data = (array) $this;
         $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-
         return $data;
     }
 
@@ -224,7 +227,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -236,7 +238,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
-
         return $this;
     }
 
@@ -248,7 +249,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setMetier(string $metier): static
     {
         $this->metier = $metier;
-
         return $this;
     }
 
@@ -256,7 +256,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->etat_validation;
     }
-
 
     public function getDateCreation(): ?\DateTime
     {
@@ -266,7 +265,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDateCreation(\DateTime $dateCreation): static
     {
         $this->dateCreation = $dateCreation;
-
         return $this;
     }
 
@@ -278,7 +276,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFormation(?string $formation): static
     {
         $this->formation = $formation;
-
         return $this;
     }
 
@@ -290,7 +287,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCv(?string $cv): static
     {
         $this->cv = $cv;
-
         return $this;
     }
 
@@ -302,7 +298,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSpecialite(?string $specialite): static
     {
         $this->specialite = $specialite;
-
         return $this;
     }
 
@@ -314,7 +309,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPosteOccupe(?string $posteOccupe): static
     {
         $this->posteOccupe = $posteOccupe;
-
         return $this;
     }
 
@@ -326,7 +320,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRefHopital(?Hopital $refHopital): static
     {
         $this->refHopital = $refHopital;
-
         return $this;
     }
 
@@ -338,7 +331,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRefEtablissement(?Etablissement $refEtablissement): static
     {
         $this->refEtablissement = $refEtablissement;
-
         return $this;
     }
 
@@ -350,7 +342,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRefEntreprise(?Etablissement $refEntreprise): static
     {
         $this->refEntreprise = $refEntreprise;
-
         return $this;
     }
 
@@ -368,19 +359,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->reponses->add($reponse);
             $reponse->setRefUser($this);
         }
-
         return $this;
     }
 
     public function removeReponse(Reponse $reponse): static
     {
         if ($this->reponses->removeElement($reponse)) {
-            // set the owning side to null (unless already changed)
             if ($reponse->getRefUser() === $this) {
                 $reponse->setRefUser(null);
             }
         }
-
         return $this;
     }
 
@@ -398,19 +386,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->canals->add($canal);
             $canal->setRefUser($this);
         }
-
         return $this;
     }
 
     public function removeCanal(Canal $canal): static
     {
         if ($this->canals->removeElement($canal)) {
-            // set the owning side to null (unless already changed)
             if ($canal->getRefUser() === $this) {
                 $canal->setRefUser(null);
             }
         }
-
         return $this;
     }
 
@@ -428,19 +413,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->posts->add($post);
             $post->setRefUser($this);
         }
-
         return $this;
     }
 
     public function removePost(Post $post): static
     {
         if ($this->posts->removeElement($post)) {
-            // set the owning side to null (unless already changed)
             if ($post->getRefUser() === $this) {
                 $post->setRefUser(null);
             }
         }
-
         return $this;
     }
 
@@ -458,20 +440,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->inscriptions->add($inscription);
             $inscription->setRefUser($this);
         }
-
         return $this;
     }
 
     public function removeInscription(Inscription $inscription): static
     {
         if ($this->inscriptions->removeElement($inscription)) {
-            // set the owning side to null (unless already changed)
             if ($inscription->getRefUser() === $this) {
                 $inscription->setRefUser(null);
             }
         }
-
-
         return $this;
     }
 
@@ -489,21 +467,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->candidatures->add($candidature);
             $candidature->setRefUser($this);
         }
-
         return $this;
     }
 
     public function removeCandidature(Candidature $candidature): static
     {
         if ($this->candidatures->removeElement($candidature)) {
-            // set the owning side to null (unless already changed)
             if ($candidature->getRefUser() === $this) {
                 $candidature->setRefUser(null);
             }
         }
-
         return $this;
     }
-
-
 }

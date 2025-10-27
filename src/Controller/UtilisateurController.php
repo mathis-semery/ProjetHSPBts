@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Form\UserType;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,10 +31,14 @@ class UtilisateurController extends AbstractController
         $plainPassword = $form->get('password')->getData();
 
 
+        $plainPassword = $form->get('password')->getData();
+
         if (!empty($plainPassword)) {
             $hashed = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashed);
         }
+
+
         $em->flush();
         $this->addFlash('success', 'Profil mis à jour avec succès.');
         return $this->redirectToRoute('app_profile');

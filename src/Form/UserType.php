@@ -11,13 +11,43 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
+
+
 
 class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('email')
+        if ($options['profile_mode']) {
+            $builder
+                ->add('email')
+                ->add('nom')
+                ->add('prenom')
+                ->add('password', PasswordType::class, [
+                    'required' => false,
+                    'mapped' => true,
+                    'attr' => ['placeholder' => '********'],
+                ])
+                ->add('cv', FileType::class, [
+                    'label' => 'CV (PDF)',
+                    'mapped' => false,
+                    'required' => false,
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '5M',
+                            'mimeTypes' => [
+                                'application/pdf',
+                                'application/x-pdf',
+                            ],
+                            'mimeTypesMessage' => 'Veuillez uploader un fichier PDF valide',
+                        ])
+                    ],
+                ]);
+        } else {
+            $builder
             ->add('rolesForForm', ChoiceType::class, [
                 'label' => 'Rôles',
                 'choices' => [
@@ -26,52 +56,65 @@ class UserType extends AbstractType
                 ],
                 'multiple' => true,
                 'expanded' => true,
-                'mapped' => false, // on gère manuellement
+                'mapped' => false,
             ])
-            ->add('password')
-            ->add('nom')
-            ->add('prenom')
-            ->add('metier')
-            ->add('etat_validation', CheckboxType::class, [
-                'required' => false,
-                'label' => 'Validé ?',
-            ])
-            ->add('dateCreation')
-            ->add('formation')
-            ->add('cv')
-            ->add('specialite')
-            ->add('posteOccupe')
-            ->add('refHopital', EntityType::class, [
-                'class' => Hopital::class,
-                'choice_label' => 'nom', // mieux que 'id'
-                'required' => false,
-            ])
-            ->add('refEtablissement', EntityType::class, [
-                'class' => Etablissement::class,
-                'choice_label' => 'nom',
-                'required' => false,
-            ])
-            ->add('refEntreprise', EntityType::class, [
-                'class' => Etablissement::class,
-                'choice_label' => 'nom',
-                'required' => false,
-            ])
-        ;
+                ->add('password', \Symfony\Component\Form\Extension\Core\Type\PasswordType::class, [
+                    'mapped' => true,
+                    'required' => false,
+                    'attr' => [
+                        'placeholder' => '********',
+                    ],
+                ])
+                ->add('metier')
+                ->add('formation')
+                ->add('specialite')
+                ->add('posteOccupe')
+                ->add('dateCreation')
+                ->add('etat_validation', CheckboxType::class, [
+                    'required' => false,
+                    'label' => 'Validé ?',
+                ])
+
+
+                ->add('refHopital', EntityType::class, [
+                    'class' => Hopital::class,
+                    'choice_label' => 'nom',
+                    'required' => false,
+                ])
+                ->add('refEtablissement', EntityType::class, [
+                    'class' => Etablissement::class,
+                    'choice_label' => 'nom',
+                    'required' => false,
+                ])
+                ->add('refEntreprise', EntityType::class, [
+                    'class' => Etablissement::class,
+                    'choice_label' => 'nom',
+                    'required' => false,
+                ])
+            ;
+
+        }
+
+
+
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'profile_mode' => false,
         ]);
     }
 
-    // Gérer manuellement le champ rolesForForm
+
     public function finishView(\Symfony\Component\Form\FormView $view, \Symfony\Component\Form\FormInterface $form, array $options): void
     {
         $user = $form->getData();
-        if ($user instanceof User) {
+        if ($user instanceof User && isset($view['rolesForForm'])) {
             $view['rolesForForm']->vars['data'] = $user->getRoles();
         }
     }
+
 }

@@ -187,6 +187,18 @@
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                         Déconnexion
                                     </a>
+                                    <a href="{{ path('app_profile', { id: app.user.id }) }}"
+                                       class="menu-link d-flex px-5"
+                                       onclick="event.preventDefault(); document.getElementById('profile-form').submit();">
+                                        Mon profil
+                                    </a>
+
+                                    <form id="profile-form"
+                                          action="{{ path('app_profile', { id: app.user.id }) }}"
+                                          method="GET"
+                                          style="display: none;"></form>
+
+
                                     <form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="d-none">
                                         {{ csrf_token('logout')|raw }}
                                     </form>

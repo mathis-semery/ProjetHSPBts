@@ -1,13 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit User{% endblock %}
+{% block title %}Modifier utilisateur{% endblock %}
 
 {% block body %}
-    <h1>Edit User</h1>
+    <h1>Modifier l'utilisateur</h1>
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
 
-    {{ include('user/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ form_start(form) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.password) }}
+    {{ form_row(form.nom) }}
+    {{ form_row(form.prenom) }}
+    {{ form_row(form.cv) }}
+    {% if user.cv %}
+        <p>CV actuel :
+            <a href="{{ asset('uploads/cv/' ~ user.cv) }}" target="_blank" download>
+                Télécharger le CV
+            </a>
+        </p>
+    {% endif %}
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
 
-    {{ include('user/_delete_form.html.twig') }}
+    <button class="btn btn-primary mt-3">Enregistrer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_profile') }}" class="btn btn-secondary mt-2">Retour à la liste</a>
 {% endblock %}

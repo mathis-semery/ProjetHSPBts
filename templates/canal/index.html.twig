@@ -1,39 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Canal index{% endblock %}
+{% block title %}Liste des canaux{% endblock %}
 
 {% block body %}
-    <h1>Canal index</h1>
+    <h1>Liste des canaux</h1>
 
     <table class="table">
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>ListeAuto</th>
-                <th>actions</th>
-            </tr>
+        <tr>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
         {% for canal in canals %}
             <tr>
-                <td>{{ canal.id }}</td>
                 <td>{{ canal.nom }}</td>
                 <td>{{ canal.description }}</td>
-                <td>{{ canal.ListeAuto }}</td>
                 <td>
-                    <a href="{{ path('app_canal_show', {'id': canal.id}) }}">show</a>
-                    <a href="{{ path('app_canal_edit', {'id': canal.id}) }}">edit</a>
+                    <a href="{{ path('app_canal_view', {id: canal.id}) }}" class="btn btn-primary btn-sm">Voir</a>
+                    <a href="{{ path('app_canal_edit', {id: canal.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                    <form method="post" action="{{ path('app_canal_delete', {id: canal.id}) }}" style="display:inline-block;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ canal.id) }}">
+                        <button class="btn btn-danger btn-sm">Supprimer</button>
+                    </form>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="3"><em>Aucun canal trouvé.</em></td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_canal_new') }}">Create new</a>
+    <a href="{{ path('app_canal_new') }}" class="btn btn-success">Créer un nouveau canal</a>
 {% endblock %}

@@ -2,39 +2,29 @@
 
 namespace App\Form;
 
-use App\Entity\Canal;
 use App\Entity\Post;
-use App\Entity\Reponse;
-use App\Entity\user;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PostType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('titre')
-            ->add('texte')
-            ->add('dateHeure')
-            ->add('refReponse', EntityType::class, [
-                'class' => Reponse::class,
-                'choice_label' => 'id',
+            ->add('titre', TextType::class, [
+                'label' => 'Titre du post',
+                'required' => false,
             ])
-            ->add('refCanal', EntityType::class, [
-                'class' => Canal::class,
-                'choice_label' => 'id',
-            ])
-            ->add('refUser', EntityType::class, [
-                'class' => user::class,
-                'choice_label' => 'id',
-            ])
-        ;
+            ->add('texte', TextareaType::class, [
+                'label' => 'Contenu',
+                'attr' => ['rows' => 4],
+            ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => Post::class,

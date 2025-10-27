@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ canal.nom }} - Chat{% endblock %}
+
+{% block body %}
+    <h1>{{ canal.nom }}</h1>
+    <p>{{ canal.description }}</p>
+    <hr>
+
+    {% if app.user %}
+        <h3>Créer un nouveau post</h3>
+        {{ form_start(formPost) }}
+        {{ form_row(formPost.titre) }}
+        {{ form_row(formPost.texte) }}
+        <button class="btn btn-success">Publier</button>
+        {{ form_end(formPost) }}
+        <hr>
+    {% endif %}
+
+    {% macro render_reponses(reponses) %}
+        <ul style="margin-left:20px;">
+            {% for reponse in reponses %}
+                <li>
+                    <strong>{{ reponse.refUser.userIdentifier }}</strong> : {{ reponse.texte }}
+                    <em>({{ reponse.dateHeure|date('H:i') }})</em>
+
+                    {% if app.user %}
+                        <form method="post" style="margin-top:5px;">
+                            <textarea name="texte" rows="2" class="form-control" placeholder="Répondre..." required></textarea>
+                            <input type="hidden" name="post_id" value="{{ reponse.refPost.id }}">
+                            <input type="hidden" name="parent_id" value="{{ reponse.id }}">
+                            <button type="submit" class="btn btn-sm btn-primary mt-1">Répondre</button>
+                        </form>
+                    {% endif %}
+
+                    {% if reponse.children|length > 0 %}
+                        {{ _self.render_reponses(reponse.children) }}
+                    {% endif %}
+                </li>
+            {% else %}
+                <li><em>Aucune réponse</em></li>
+            {% endfor %}
+        </ul>
+    {% endmacro %}
+
+    {% import _self as macros %}
+
+    {% for post in canal.posts %}
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <h4>{{ post.titre ?? 'Post' }} - {{ post.refUser.userIdentifier }}</h4>
+            <p>{{ post.texte }}</p>
+
+            {{ macros.render_reponses(post.reponses|filter(r => r.parent is null)) }}
+        </div>
+    {% else %}
+        <p><em>Aucun post pour ce canal.</em></p>
+    {% endfor %}
+
+    <hr>
+    <a href="{{ path('app_canal_index') }}">← Retour à la liste des canaux</a>
+{% endblock %}

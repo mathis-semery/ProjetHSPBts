@@ -27,57 +27,16 @@ class Reponse
     #[ORM\JoinColumn(nullable: false)]
     private ?User $refUser = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getTexte(): ?string { return $this->texte; }
+    public function setTexte(string $texte): static { $this->texte = $texte; return $this; }
 
-    public function getTexte(): ?string
-    {
-        return $this->texte;
-    }
+    public function getDateHeure(): ?\DateTime { return $this->dateHeure; }
+    public function setDateHeure(\DateTime $dateHeure): static { $this->dateHeure = $dateHeure; return $this; }
 
-    public function setTexte(string $texte): static
-    {
-        $this->texte = $texte;
+    public function getRefPost(): ?Post { return $this->refPost; }
+    public function setRefPost(?Post $refPost): static { $this->refPost = $refPost; return $this; }
 
-        return $this;
-    }
-
-    public function getDateHeure(): ?\DateTime
-    {
-        return $this->dateHeure;
-    }
-
-    public function setDateHeure(\DateTime $dateHeure): static
-    {
-        $this->dateHeure = $dateHeure;
-
-        return $this;
-    }
-
-    public function getRefPost(): ?Post
-    {
-        return $this->refPost;
-    }
-
-    public function setRefPost(?Post $refPost): static
-    {
-        $this->refPost = $refPost;
-
-        return $this;
-    }
-
-    public function getRefUser(): ?User
-    {
-        return $this->refUser;
-    }
-
-    public function setRefUser(?User $refUser): static
-    {
-        $this->refUser = $refUser;
-
-        return $this;
-    }
-
+    public function getRefUser(): ?User { return $this->refUser; }
+    public function setRefUser(?User $refUser): static { $this->refUser = $refUser; return $this; }
 }

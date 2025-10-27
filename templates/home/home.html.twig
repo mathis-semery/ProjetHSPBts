@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - GDH Console{% endblock %}
+
+{% block body %}
+    <h1 class="mb-6">Bienvenue sur le tableau de bord de l'hôpital</h1>
+
+    <div class="row g-4 mb-8">
+        <!-- Statistiques rapides -->
+        <div class="col-md-3">
+            <div class="card text-white bg-primary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Patients</h5>
+                    <p class="card-text display-6">124</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Médecins</h5>
+                    <p class="card-text display-6">23</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Chambres disponibles</h5>
+                    <p class="card-text display-6">12</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Alertes</h5>
+                    <p class="card-text display-6">3</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="mb-8">
+        <h3 class="mb-4">Actions rapides</h3>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{{ path('app_home') }}" class="btn btn-primary btn-lg">Gérer les patients</a>
+            <a href="{{ path('app_home') }}" class="btn btn-success btn-lg">Gérer les médecins</a>
+            <a href="{{ path('app_home') }}" class="btn btn-warning btn-lg">Gérer les chambres</a>
+            <a href="{{ path('app_home') }}" class="btn btn-danger btn-lg">Voir les alertes</a>
+        </div>
+    </div>
+
+    <!-- Dernières actions / activité -->
+    <div>
+        <h3 class="mb-4">Dernières activités</h3>
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Utilisateur</th>
+                <th scope="col">Action</th>
+                <th scope="col">Détails</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>22/10/2025 10:45</td>
+                <td>Dr. Dupont</td>
+                <td>Ajout patient</td>
+                <td>Patient Jean Martin enregistré</td>
+            </tr>
+            <tr>
+                <td>22/10/2025 09:30</td>
+                <td>Infirmière Claire</td>
+                <td>Mise à jour chambre</td>
+                <td>Chambre 203 libérée</td>
+            </tr>
+            <tr>
+                <td>21/10/2025 16:20</td>
+                <td>Admin</td>
+                <td>Création compte médecin</td>
+                <td>Dr. Laura Petit ajouté</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

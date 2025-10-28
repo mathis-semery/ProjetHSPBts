@@ -29,10 +29,27 @@ class UserPendingController extends AbstractController
     #[Route('/{id}/accepter', name: 'user_pending_accept', methods: ['POST'])]
     public function accept(
         User $user,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        MailerInterface $mailer
+
     ): Response {
         $user->setEtatValidation(true);
+        $user->setRoles(['ROLE_USER']);
         $entityManager->flush();
+
+        $email = (new Email())
+            ->from('no-reply@' . $_ENV['NOM_DOMAINE'] ?? 'localhost')
+            ->to($user->getEmail())
+            ->subject('Votre inscription a été refusée')
+            ->html(<<<HTML
+<p>Bonjour {$user->getPrenom()},</p>
+<p>Nous vous informons que votre demande d’inscription a été validée.</p>
+<p>Pour toute question, veuillez contacter l’administrateur du site.</p>
+<p>Cordialement,<br>L’équipe HSP</p>
+HTML
+            );
+
+        $mailer->send($email);
 
         $this->addFlash('success', 'L’utilisateur a été accepté avec succès.');
 

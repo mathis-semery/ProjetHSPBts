@@ -67,7 +67,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Hopital $refHopital = null;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\ManyToOne(inversedBy: 'usersrefEntreprise')]
     private ?Etablissement $refEtablissement = null;
 
     /**
@@ -104,7 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $candidatures;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
-    private ?Entreprise $refEntreptrise = null;
+    private ?Entreprise $refEntreprise = null;
 
     public function __construct()
     {
@@ -339,17 +339,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRefEntreprise(): ?Etablissement
-    {
-        return $this->refEntreprise;
-    }
-
-    public function setRefEntreprise(?Etablissement $refEntreprise): static
-    {
-        $this->refEntreprise = $refEntreprise;
-        return $this;
-    }
-
     /**
      * @return Collection<int, Reponse>
      */
@@ -485,14 +474,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRefEntreptrise(): ?Entreprise
+    public function getrefEntreprise(): ?Entreprise
     {
-        return $this->refEntreptrise;
+        return $this->refEntreprise;
     }
 
-    public function setRefEntreptrise(?Entreprise $refEntreptrise): static
+    public function setrefEntreprise(?Entreprise $refEntreprise): static
     {
-        $this->refEntreptrise = $refEntreptrise;
+        $this->refEntreprise = $refEntreprise;
 
         return $this;
     }

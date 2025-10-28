@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Entreprise;
 use App\Entity\Etablissement;
 use App\Entity\Hopital;
 use App\Entity\User;
@@ -86,8 +87,8 @@ class UserType extends AbstractType
                     'choice_label' => 'nom',
                     'required' => false,
                 ])
-                ->add('refEntreprise', EntityType::class, [
-                    'class' => Etablissement::class,
+                ->add('refEntretrise', EntityType::class, [
+                    'class' => Entreprise::class,
                     'choice_label' => 'nom',
                     'required' => false,
                 ])

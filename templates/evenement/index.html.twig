@@ -1,45 +1,75 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Evenement index{% endblock %}
+{% block title %}Gestion des Événements{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .btn-action {
+            margin-right: 0.3rem;
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Evenement index</h1>
+    <div class="d-flex justify-content-between align-items-center mb-6">
+        <h1 class="h2">Gestion des Événements</h1>
+        <a href="{{ path('app_evenement_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Ajouter un événement
+        </a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Type</th>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>Adresse</th>
-                <th>NombreDePlace</th>
-                <th>ElementRequis</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for evenement in evenements %}
-            <tr>
-                <td>{{ evenement.id }}</td>
-                <td>{{ evenement.type }}</td>
-                <td>{{ evenement.titre }}</td>
-                <td>{{ evenement.description }}</td>
-                <td>{{ evenement.adresse }}</td>
-                <td>{{ evenement.nombreDePlace }}</td>
-                <td>{{ evenement.elementRequis }}</td>
-                <td>
-                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}">show</a>
-                    <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% if evenements is empty %}
+        <div class="alert alert-info">
+            Aucun événement n’a été créé pour le moment.
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Titre</th>
+                    <th>Adresse</th>
+                    <th>Places</th>
+                    <th>Éléments requis</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for evenement in evenements %}
+                    <tr>
+                        <td>{{ evenement.id }}</td>
+                        <td><span class="badge bg-secondary">{{ evenement.type }}</span></td>
+                        <td><strong>{{ evenement.titre }}</strong></td>
+                        <td>{{ evenement.adresse ?: '—' }}</td>
+                        <td>{{ evenement.nombreDePlace ?? 'Illimité' }}</td>
+                        <td>{{ evenement.elementRequis|length > 30 ? evenement.elementRequis|slice(0, 30) ~ '…' : evenement.elementRequis ?: '—' }}</td>
+                        <td class="text-end">
+                            <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="btn btn-sm btn-outline-info btn-action">
+                                Voir
+                            </a>
+                            <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-outline-warning btn-action">
+                                Modifier
+                            </a>
+                            <form method="post" action="{{ path('app_evenement_delete', {'id': evenement.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger btn-action">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}
 
-    <a href="{{ path('app_evenement_new') }}">Create new</a>
+{% block javascripts %}
 {% endblock %}

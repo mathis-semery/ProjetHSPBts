@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\ReponseRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: ReponseRepository::class)]
 class Reponse
@@ -26,6 +28,11 @@ class Reponse
     #[ORM\ManyToOne(inversedBy: 'reponses')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $refUser = null;
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
+    private ?self $parent = null;
+
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
+    private Collection $children;
 
     public function getId(): ?int { return $this->id; }
     public function getTexte(): ?string { return $this->texte; }
@@ -39,4 +46,12 @@ class Reponse
 
     public function getRefUser(): ?User { return $this->refUser; }
     public function setRefUser(?User $refUser): static { $this->refUser = $refUser; return $this; }
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+    }
+
+    public function getParent(): ?self { return $this->parent; }
+    public function setParent(?self $parent): static { $this->parent = $parent; return $this; }
+    public function getChildren(): Collection { return $this->children; }
 }

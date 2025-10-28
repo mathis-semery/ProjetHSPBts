@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EntrepriseRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EntrepriseRepository::class)]
@@ -22,8 +24,16 @@ class Entreprise
     #[ORM\Column(length: 255 , unique: true)]
     private ?string $siteWeb = null;
 
-    #[ORM\OneToOne(mappedBy: 'refEntreprise', cascade: ['persist', 'remove'])]
-    private ?User $refUser = null;
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'refEntreptrise')]
+    private Collection $users;
+
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -66,25 +76,34 @@ class Entreprise
         return $this;
     }
 
-    public function getRefUser(): ?User
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
     {
-        return $this->refUser;
+        return $this->users;
     }
 
-    public function setRefUser(?User $refUser): static
+    public function addUser(User $user): static
     {
-        // unset the owning side of the relation if necessary
-        if ($refUser === null && $this->refUser !== null) {
-            $this->refUser->setRefEntreprise(null);
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->setRefEntreptrise($this);
         }
-
-        // set the owning side of the relation if necessary
-        if ($refUser !== null && $refUser->getRefEntreprise() !== $this) {
-            $refUser->setRefEntreprise($this);
-        }
-
-        $this->refUser = $refUser;
 
         return $this;
     }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getRefEntreptrise() === $this) {
+                $user->setRefEntreptrise(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

@@ -23,10 +23,6 @@ class Etablissement
 
     #[ORM\Column(length: 255 , unique: true)]
     private ?string $siteWeb = null;
-
-    #[ORM\OneToOne(mappedBy: 'refEtablissement', cascade: ['persist', 'remove'])]
-    private ?User $refUser = null;
-
     /**
      * @var Collection<int, User>
      */
@@ -75,28 +71,6 @@ class Etablissement
     public function setSiteWeb(string $siteWeb): static
     {
         $this->siteWeb = $siteWeb;
-
-        return $this;
-    }
-
-    public function getRefUser(): ?User
-    {
-        return $this->refUser;
-    }
-
-    public function setRefUser(?User $refUser): static
-    {
-        // unset the owning side of the relation if necessary
-        if ($refUser === null && $this->refUser !== null) {
-            $this->refUser->setRefEtablissement(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($refUser !== null && $refUser->getRefEtablissement() !== $this) {
-            $refUser->setRefEtablissement($this);
-        }
-
-        $this->refUser = $refUser;
 
         return $this;
     }

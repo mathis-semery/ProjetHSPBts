@@ -17,11 +17,6 @@ class CanalType extends AbstractType
         $builder
             ->add('nom')
             ->add('description')
-            ->add('ListeAuto')
-            ->add('refPost', EntityType::class, [
-                'class' => Post::class,
-                'choice_label' => 'id',
-            ])
             ->add('refUser', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'id',

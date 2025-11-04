@@ -87,7 +87,7 @@ class UserType extends AbstractType
                     'choice_label' => 'nom',
                     'required' => false,
                 ])
-                ->add('refEntretrise', EntityType::class, [
+                ->add('refEntreprise', EntityType::class, [
                     'class' => Entreprise::class,
                     'choice_label' => 'nom',
                     'required' => false,

@@ -32,6 +32,7 @@ security:
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/verify-email, roles: PUBLIC_ACCESS }
         - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/verify, roles: PUBLIC_ACCESS }
 
         # Admin
         - { path: ^/admin, roles: ROLE_ADMIN }

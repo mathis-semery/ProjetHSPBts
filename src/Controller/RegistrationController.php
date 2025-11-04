@@ -69,6 +69,7 @@ class RegistrationController extends AbstractController
 
         if (!$user) {
 
+
             $this->addFlash('danger', 'L\'URL de validation est invalide ou a expiré.');
             return $this->redirectToRoute('app_login');
         }
@@ -76,7 +77,7 @@ class RegistrationController extends AbstractController
 
         $user->setVerificationToken(null); // Le token est utilisé et doit être effacé
         $user->setRoles(['ROLE_ATTENTE_VERIFICATION']);
-
+        $entityManager->persist($user);
 
         $entityManager->flush();
 

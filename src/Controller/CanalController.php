@@ -7,6 +7,7 @@ use App\Entity\Post;
 use App\Entity\Reponse;
 use App\Form\CanalType;
 use App\Form\PostType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,15 +20,18 @@ class CanalController extends AbstractController
     #[Route('/', name: 'app_canal_index', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
         $canals = $em->getRepository(Canal::class)->findAll();
+
+        $visibleCanals = array_filter($canals, fn($c) => in_array($user->getMetier(), array_map('trim', explode(',', $c->getListeAuto() ?? ''))) || $c->getRefUser() === $user);
+
         return $this->render('canal/index.html.twig', [
-            'canals' => $canals,
+            'canals' => $visibleCanals,
         ]);
     }
 
     #[Route('/new', name: 'app_canal_new', methods: ['GET','POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
+    public function new(Request $request, EntityManagerInterface $em, UserRepository $userRepo): Response    {
         $canal = new Canal();
         $form = $this->createForm(CanalType::class, $canal);
         $form->handleRequest($request);
@@ -37,6 +41,9 @@ class CanalController extends AbstractController
             $em->persist($canal);
             $em->flush();
 
+            $this->applyListeAuto($canal, $userRepo);
+
+            $em->flush();
             return $this->redirectToRoute('app_canal_index');
         }
 
@@ -51,7 +58,6 @@ class CanalController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        // Formulaire pour créer un nouveau post
         $post = new Post();
         $formPost = $this->createForm(PostType::class, $post);
         $formPost->handleRequest($request);
@@ -61,11 +67,9 @@ class CanalController extends AbstractController
             $post->setRefCanal($canal);
             $em->persist($post);
             $em->flush();
-
             return $this->redirectToRoute('app_canal_view', ['id' => $canal->getId()]);
         }
 
-        // Gestion de l'envoi d'une réponse à un post
         if ($request->isMethod('POST') && $request->request->has('texte') && $request->request->has('post_id')) {
             $texte = trim($request->request->get('texte'));
             $postId = $request->request->getInt('post_id');
@@ -78,9 +82,16 @@ class CanalController extends AbstractController
                 $reponse->setTexte($texte);
                 $reponse->setDateHeure(new \DateTime());
 
+                if ($request->request->has('parent_id')) {
+                    $parentId = $request->request->getInt('parent_id');
+                    $parentReponse = $em->getRepository(Reponse::class)->find($parentId);
+                    if ($parentReponse) {
+                        $reponse->setParent($parentReponse);
+                    }
+                }
+
                 $em->persist($reponse);
                 $em->flush();
-
                 return $this->redirectToRoute('app_canal_view', ['id' => $canal->getId()]);
             }
         }
@@ -92,12 +103,18 @@ class CanalController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_canal_edit', methods: ['GET','POST'])]
-    public function edit(Request $request, Canal $canal, EntityManagerInterface $em): Response
+    public function edit(Request $request, Canal $canal, EntityManagerInterface $em, UserRepository $userRepo): Response
     {
         $form = $this->createForm(CanalType::class, $canal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $canal->setRefUser($this->getUser());
+            $em->persist($canal);
+            $em->flush();
+
+            $this->applyListeAuto($canal, $userRepo);
+
             $em->flush();
             return $this->redirectToRoute('app_canal_index');
         }
@@ -118,4 +135,23 @@ class CanalController extends AbstractController
 
         return $this->redirectToRoute('app_canal_index');
     }
+    private function applyListeAuto(Canal $canal, UserRepository $userRepo): void
+    {
+        $listeAuto = $canal->getListeAuto();
+        if (!$listeAuto) return;
+
+
+        $canal->getUsers()->clear();
+
+        $items = array_map('trim', explode(',', $listeAuto));
+
+        foreach ($items as $item) {
+            $users = $userRepo->findBy(['metier' => $item]);
+
+            foreach ($users as $user) {
+                $canal->addUser($user);
+            }
+        }
+    }
+
 }

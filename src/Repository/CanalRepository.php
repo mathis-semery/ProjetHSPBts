@@ -16,6 +16,18 @@ class CanalRepository extends ServiceEntityRepository
         parent::__construct($registry, Canal::class);
     }
 
+    public function findVisibleByUser(User $user)
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        $qb->where(':metier MEMBER OF c.ListeAuto OR c.refUser = :user')
+            ->setParameter('metier', $user->getMetier())
+            ->setParameter('user', $user);
+
+        return $qb->getQuery()->getResult();
+    }
+
+
 //    /**
 //     * @return Canal[] Returns an array of Canal objects
 //     */

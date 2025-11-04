@@ -2,9 +2,24 @@
 
 {% block title %}Gestion des utilisateurs{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <style>
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            padding: 8px 0;
+        }
+        .badge-role {
+            margin-right: 4px;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Utilisateurs</h1>
+        <h1>Gestion des utilisateurs</h1>
         <a href="{{ path('app_user_new') }}" class="btn btn-primary">Créer un utilisateur</a>
     </div>
 
@@ -18,16 +33,29 @@
         <div class="alert alert-danger">{{ message }}</div>
     {% endfor %}
 
-    {% if users|length == 0 %}
-        <div class="alert alert-info">Aucun utilisateur trouvé.</div>
-    {% else %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
+    <!-- Onglets pour basculer entre les catégories -->
+    <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="eleves-tab" data-bs-toggle="tab" data-bs-target="#eleves" type="button" role="tab">Élèves / Étudiants</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="medecins-tab" data-bs-toggle="tab" data-bs-target="#medecins" type="button" role="tab">Médecins</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="partenaires-tab" data-bs-toggle="tab" data-bs-target="#partenaires" type="button" role="tab">Partenaires</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="userTabContent">
+        <!-- ÉLÈVES -->
+        <div class="tab-pane fade show active" id="eleves" role="tabpanel">
+            <table id="table-eleves" class="table table-hover align-middle display">
                 <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nom</th>
                     <th>Email</th>
+                    <th>Métier</th>
                     <th>Rôles</th>
                     <th>Validé</th>
                     <th>Créé le</th>
@@ -35,30 +63,168 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for user in users %}
-                    <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.prenom }} {{ user.nom }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>
-                            {% for role in user.roles %}
-                                <span class="badge bg-{% if role == 'ROLE_ADMIN' %}danger{% else %}secondary{% endif %}">{{ role }}</span>
-                            {% endfor %}
-                        </td>
-                        <td>{{ user.etatValidation ? '✅' : '❌' }}</td>
-                        <td>{{ user.dateCreation ? user.dateCreation|date('d/m/Y') : '' }}</td>
-                        <td>
-                            <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-sm btn-outline-info">Voir</a>
-                            <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
-                            <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                                <button class="btn btn-sm btn-outline-danger">Supprimer</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
                 </tbody>
             </table>
         </div>
-    {% endif %}
+
+        <!-- MÉDECINS -->
+        <div class="tab-pane fade" id="medecins" role="tabpanel">
+            <table id="table-medecins" class="table table-hover align-middle display">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Métier</th>
+                    <th>Rôles</th>
+                    <th>Validé</th>
+                    <th>Créé le</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PARTENAIRES -->
+        <div class="tab-pane fade" id="partenaires" role="tabpanel">
+            <table id="table-partenaires" class="table table-hover align-middle display">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Métier</th>
+                    <th>Rôles</th>
+                    <th>Validé</th>
+                    <th>Créé le</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Définir les listes de métiers par catégorie
+            const METIERS_ELEVES = ['ETUDIANT'];
+            const METIERS_MEDECINS = ['MEDECIN'];
+            const METIERS_PARTENAIRES = ['PARTENAIRE'];
+
+            // Fonction utilitaire : vérifie si un métier appartient à une catégorie
+            function appartient(metier, liste) {
+                if (!metier) return false;
+                return liste.some(term => metier.trim().toLowerCase() === term.trim().toLowerCase());
+            }
+
+            // Préparer les données une seule fois
+            let allData = [];
+            {% for user in users %}
+            allData.push({
+                id: {{ user.id }},
+                nom: "{{ user.nom|e('js') }}",
+                prenom: "{{ user.prenom|e('js') }}",
+                email: "{{ user.email|e('js') }}",
+                metier: "{{ user.metier|e('js') }}",
+                roles: {{ user.roles|json_encode|raw }},
+                etatValidation: {{ user.etatValidation ? 'true' : 'false' }},
+                dateCreation: "{{ user.dateCreation ? user.dateCreation|date('d/m/Y') : '' }}",
+                showUrl: "{{ path('app_user_show', {'id': user.id}) }}",
+                editUrl: "{{ path('app_user_edit', {'id': user.id}) }}",
+                deleteUrl: "{{ path('app_user_delete', {'id': user.id}) }}",
+                deleteToken: "{{ csrf_token('delete' ~ user.id) }}"
+            });
+            {% endfor %}
+
+            // Fonction pour générer les badges de rôles
+            function renderRoles(roles) {
+                let html = '';
+                roles.forEach(role => {
+                    const cls = role === 'ROLE_ADMIN' ? 'bg-danger' : 'bg-secondary';
+                    html += `<span class="badge badge-role ${cls}">${role}</span>`;
+                });
+                return html;
+            }
+
+            // Fonction pour générer les boutons d'action
+            function renderActions(user) {
+                return `
+                    <a href="${user.showUrl}" class="btn btn-sm btn-outline-info">Voir</a>
+                    <a href="${user.editUrl}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                    <form method="post" action="${user.deleteUrl}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="${user.deleteToken}">
+                        <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                    </form>
+                `;
+            }
+
+            // Filtrer les données
+            const elevesData = allData.filter(u => appartient(u.metier, METIERS_ELEVES));
+            const medecinsData = allData.filter(u => appartient(u.metier, METIERS_MEDECINS));
+            const partenairesData = allData.filter(u => appartient(u.metier, METIERS_PARTENAIRES));
+
+            // Initialiser les 3 DataTables
+            $('#table-eleves').DataTable({
+                data: elevesData,
+                columns: [
+                    { data: 'id' },
+                    { data: null, render: (data) => `${data.prenom} ${data.nom}` },
+                    { data: 'email' },
+                    { data: 'metier' },
+                    { data: 'roles', render: renderRoles },
+                    { data: 'etatValidation', render: (val) => val ? '✅' : '❌' },
+                    { data: 'dateCreation' },
+                    { data: null, render: renderActions, orderable: false, searchable: false }
+                ],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json"
+                },
+                pageLength: 10
+            });
+
+            $('#table-medecins').DataTable({
+                data: medecinsData,
+                columns: [
+                    { data: 'id' },
+                    { data: null, render: (data) => `${data.prenom} ${data.nom}` },
+                    { data: 'email' },
+                    { data: 'metier' },
+                    { data: 'roles', render: renderRoles },
+                    { data: 'etatValidation', render: (val) => val ? '✅' : '❌' },
+                    { data: 'dateCreation' },
+                    { data: null, render: renderActions, orderable: false, searchable: false }
+                ],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json"
+                },
+                pageLength: 10
+            });
+
+            $('#table-partenaires').DataTable({
+                data: partenairesData,
+                columns: [
+                    { data: 'id' },
+                    { data: null, render: (data) => `${data.prenom} ${data.nom}` },
+                    { data: 'email' },
+                    { data: 'metier' },
+                    { data: 'roles', render: renderRoles },
+                    { data: 'etatValidation', render: (val) => val ? '✅' : '❌' },
+                    { data: 'dateCreation' },
+                    { data: null, render: renderActions, orderable: false, searchable: false }
+                ],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json"
+                },
+                pageLength: 10
+            });
+        });
+    </script>
 {% endblock %}

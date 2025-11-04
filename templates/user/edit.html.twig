@@ -12,13 +12,14 @@
             </div>
         {% endfor %}
     {% endfor %}
-
     {{ form_start(form) }}
-    {{ form_row(form.email) }}
-    {{ form_row(form.password) }}
-    {{ form_row(form.nom) }}
-    {{ form_row(form.prenom) }}
-    {{ form_row(form.cv) }}
+
+    {% for child in form %}
+        {% if child.vars.name != '_token' %}
+            {{ form_row(child) }}
+        {% endif %}
+    {% endfor %}
+
     {% if user.cv %}
         <p>CV actuel :
             <a href="{{ asset('uploads/cv/' ~ user.cv) }}" target="_blank" download>
@@ -26,10 +27,10 @@
             </a>
         </p>
     {% endif %}
-
-
-    <button class="btn btn-primary mt-3">Enregistrer</button>
+{{ form_rest(form) }}
+    <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
     {{ form_end(form) }}
 
     <a href="{{ path('app_profile') }}" class="btn btn-secondary mt-2">Retour à la liste</a>
+
 {% endblock %}

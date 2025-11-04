@@ -49,50 +49,96 @@ class UserType extends AbstractType
                 ]);
         } else {
             $builder
-            ->add('rolesForForm', ChoiceType::class, [
-                'label' => 'Rôles',
-                'choices' => [
-                    'Utilisateur' => 'ROLE_USER',
-                    'Administrateur' => 'ROLE_ADMIN',
-                ],
-                'multiple' => true,
-                'expanded' => true,
-                'mapped' => false,
-            ])
-                ->add('password', \Symfony\Component\Form\Extension\Core\Type\PasswordType::class, [
-                    'mapped' => true,
+                ->add('email')
+                ->add('nom')
+                ->add('prenom')
+                ->add('cv', FileType::class, [
+                    'label' => 'CV (PDF)',
+                    'mapped' => false,
                     'required' => false,
-                    'attr' => [
-                        'placeholder' => '********',
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '5M',
+                            'mimeTypes' => [
+                                'application/pdf',
+                                'application/x-pdf',
+                            ],
+                            'mimeTypesMessage' => 'Veuillez uploader un fichier PDF valide',
+                        ])
                     ],
                 ])
-                ->add('metier')
-                ->add('formation')
-                ->add('specialite')
-                ->add('posteOccupe')
-                ->add('dateCreation')
-                ->add('etat_validation', CheckboxType::class, [
-                    'required' => false,
-                    'label' => 'Validé ?',
+                ->add('rolesForForm', ChoiceType::class, [
+                    'label' => 'Rôles',
+                    'choices' => [
+                        'Utilisateur' => 'ROLE_USER',
+                        'Administrateur' => 'ROLE_ADMIN',
+                    ],
+                    'multiple' => true,
+                    'expanded' => true,
+                    'mapped' => false,
                 ])
+                    ->add('email')
+                    ->add('nom')
+                    ->add('prenom')
+                    ->add('cv', FileType::class, [
+                        'label' => 'CV (PDF)',
+                        'mapped' => false,
+                        'required' => false,
+                        'constraints' => [
+                            new File([
+                                'maxSize' => '5M',
+                                'mimeTypes' => [
+                                    'application/pdf',
+                                    'application/x-pdf',
+                                ],
+                                'mimeTypesMessage' => 'Veuillez uploader un fichier PDF valide',
+                            ])
+                        ],
+                    ])
+                    ->add('password', \Symfony\Component\Form\Extension\Core\Type\PasswordType::class, [
+                        'mapped' => true,
+                        'required' => false,
+                        'attr' => [
+                            'placeholder' => '********',
+                        ],
+                    ])
+                    ->add('metier',ChoiceType::class, [
+                        'label' => 'metier',
+                        'choices' => [
+                            'Eleve/Etudiant' => 'ELEVE',
+                            'Medecin' => 'MEDECIN',
+                            'Partenaire' => 'PARTENAIRE',
+                        ],'multiple' => true,
+                        'expanded' => true,
+                        'mapped' => false,
+                    ])
+                    ->add('formation')
+                    ->add('specialite')
+                    ->add('posteOccupe')
+                    ->add('dateCreation')
+                    ->add('etat_validation', CheckboxType::class, [
+                        'required' => false,
+                        'label' => 'Validé ?',
+                    ])
 
 
-                ->add('refHopital', EntityType::class, [
-                    'class' => Hopital::class,
-                    'choice_label' => 'nom',
-                    'required' => false,
-                ])
-                ->add('refEtablissement', EntityType::class, [
-                    'class' => Etablissement::class,
-                    'choice_label' => 'nom',
-                    'required' => false,
-                ])
-                ->add('refEntreprise', EntityType::class, [
-                    'class' => Entreprise::class,
-                    'choice_label' => 'nom',
-                    'required' => false,
-                ])
-            ;
+                    ->add('refHopital', EntityType::class, [
+                        'class' => Hopital::class,
+                        'choice_label' => 'nom',
+                        'required' => false,
+                    ])
+                    ->add('refEtablissement', EntityType::class, [
+                        'class' => Etablissement::class,
+                        'choice_label' => 'nom',
+                        'required' => false,
+                    ])
+                    ->add('refEntreprise', EntityType::class, [
+                        'class' => Entreprise::class,
+                        'choice_label' => 'nom',
+                        'required' => false,
+                    ])
+
+                ;
 
         }
 

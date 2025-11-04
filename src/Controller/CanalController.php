@@ -3,11 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Canal;
-use App\Entity\Post;
-use App\Entity\Reponse;
 use App\Form\CanalType;
-use App\Form\PostType;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +19,13 @@ class CanalController extends AbstractController
         $user = $this->getUser();
         $canals = $em->getRepository(Canal::class)->findAll();
 
-        $visibleCanals = array_filter($canals, fn($c) => in_array($user->getMetier(), array_map('trim', explode(',', $c->getListeAuto() ?? ''))) || $c->getRefUser() === $user);
+        $visibleCanals = array_filter($canals, function(Canal $canal) use ($user) {
+            if (in_array('ROLE_ADMIN', $user->getRoles())) {
+                return true; // admin voit tout
+            }
+            $metiers = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
+            return in_array($user->getMetier(), $metiers) || $canal->getRefUser() === $user;
+        });
 
         return $this->render('canal/index.html.twig', [
             'canals' => $visibleCanals,
@@ -31,19 +33,19 @@ class CanalController extends AbstractController
     }
 
     #[Route('/new', name: 'app_canal_new', methods: ['GET','POST'])]
-    public function new(Request $request, EntityManagerInterface $em, UserRepository $userRepo): Response    {
+    public function new(Request $request, EntityManagerInterface $em): Response
+    {
         $canal = new Canal();
+        $canal->setRefUser($this->getUser());
+
         $form = $this->createForm(CanalType::class, $canal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $canal->setRefUser($this->getUser());
             $em->persist($canal);
             $em->flush();
+            $this->addFlash('success', 'Canal créé !');
 
-            $this->applyListeAuto($canal, $userRepo);
-
-            $em->flush();
             return $this->redirectToRoute('app_canal_index');
         }
 
@@ -56,42 +58,45 @@ class CanalController extends AbstractController
     #[Route('/{id}/view', name: 'app_canal_view', methods: ['GET','POST'])]
     public function view(Request $request, Canal $canal, EntityManagerInterface $em): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $this->getUser();
 
-        $post = new Post();
-        $formPost = $this->createForm(PostType::class, $post);
+        if (!in_array('ROLE_ADMIN', $user->getRoles())) {
+            $metiers = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
+            if (!in_array($user->getMetier(), $metiers) && $canal->getRefUser() !== $user) {
+                throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à ce canal.');
+            }
+        }
+
+        $post = new \App\Entity\Post();
+        $formPost = $this->createForm(\App\Form\PostType::class, $post);
         $formPost->handleRequest($request);
 
         if ($formPost->isSubmitted() && $formPost->isValid()) {
-            $post->setRefUser($this->getUser());
+            $post->setRefUser($user);
             $post->setRefCanal($canal);
+            $post->setDateHeure(new \DateTime());
+
             $em->persist($post);
             $em->flush();
+
             return $this->redirectToRoute('app_canal_view', ['id' => $canal->getId()]);
         }
 
         if ($request->isMethod('POST') && $request->request->has('texte') && $request->request->has('post_id')) {
             $texte = trim($request->request->get('texte'));
             $postId = $request->request->getInt('post_id');
-            $parentPost = $em->getRepository(Post::class)->find($postId);
+            $parentPost = $em->getRepository(\App\Entity\Post::class)->find($postId);
 
             if ($texte !== '' && $parentPost) {
-                $reponse = new Reponse();
-                $reponse->setRefUser($this->getUser());
+                $reponse = new \App\Entity\Reponse();
+                $reponse->setRefUser($user);
                 $reponse->setRefPost($parentPost);
                 $reponse->setTexte($texte);
                 $reponse->setDateHeure(new \DateTime());
 
-                if ($request->request->has('parent_id')) {
-                    $parentId = $request->request->getInt('parent_id');
-                    $parentReponse = $em->getRepository(Reponse::class)->find($parentId);
-                    if ($parentReponse) {
-                        $reponse->setParent($parentReponse);
-                    }
-                }
-
                 $em->persist($reponse);
                 $em->flush();
+
                 return $this->redirectToRoute('app_canal_view', ['id' => $canal->getId()]);
             }
         }
@@ -103,19 +108,21 @@ class CanalController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_canal_edit', methods: ['GET','POST'])]
-    public function edit(Request $request, Canal $canal, EntityManagerInterface $em, UserRepository $userRepo): Response
+    public function edit(Request $request, Canal $canal, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && $canal->getRefUser() !== $user) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce canal.');
+        }
+
         $form = $this->createForm(CanalType::class, $canal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $canal->setRefUser($this->getUser());
-            $em->persist($canal);
             $em->flush();
+            $this->addFlash('success', 'Canal modifié !');
 
-            $this->applyListeAuto($canal, $userRepo);
-
-            $em->flush();
             return $this->redirectToRoute('app_canal_index');
         }
 
@@ -128,30 +135,18 @@ class CanalController extends AbstractController
     #[Route('/{id}/delete', name: 'app_canal_delete', methods: ['POST'])]
     public function delete(Request $request, Canal $canal, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && $canal->getRefUser() !== $user) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce canal.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$canal->getId(), $request->request->get('_token'))) {
             $em->remove($canal);
             $em->flush();
+            $this->addFlash('success', 'Canal supprimé !');
         }
 
         return $this->redirectToRoute('app_canal_index');
     }
-    private function applyListeAuto(Canal $canal, UserRepository $userRepo): void
-    {
-        $listeAuto = $canal->getListeAuto();
-        if (!$listeAuto) return;
-
-
-        $canal->getUsers()->clear();
-
-        $items = array_map('trim', explode(',', $listeAuto));
-
-        foreach ($items as $item) {
-            $users = $userRepo->findBy(['metier' => $item]);
-
-            foreach ($users as $user) {
-                $canal->addUser($user);
-            }
-        }
-    }
-
 }

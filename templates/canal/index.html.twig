@@ -1,39 +1,74 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des canaux{% endblock %}
+{% block title %}Canaux de discussion{% endblock %}
 
 {% block body %}
-    <h1>Liste des canaux</h1>
+    <div class="container py-10">
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for canal in canals %}
-            <tr>
-                <td>{{ canal.nom }}</td>
-                <td>{{ canal.description }}</td>
-                <td>
-                    <a href="{{ path('app_canal_view', {id: canal.id}) }}" class="btn btn-primary btn-sm">Voir</a>
-                    <a href="{{ path('app_canal_edit', {id: canal.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
-                    <form method="post" action="{{ path('app_canal_delete', {id: canal.id}) }}" style="display:inline-block;">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ canal.id) }}">
-                        <button class="btn btn-danger btn-sm">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
+        <!-- En-tête -->
+        <div class="card mb-10">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div>
+                    <h1 class="fs-2hx fw-bold text-dark mb-2">Canaux de discussion</h1>
+                    <p class="text-gray-600 mb-0">Rejoignez ou créez des espaces pour discuter et partager.</p>
+                </div>
+
+                {% if app.user %}
+                    <a href="{{ path('app_canal_new') }}" class="btn btn-primary mt-4 mt-md-0">
+                        <i class="ki-duotone ki-plus fs-2 me-2"></i> Nouveau canal
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Liste des canaux -->
+        {% if canals is not empty %}
+            <div class="row g-6">
+                {% for canal in canals %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card card-flush h-100 shadow-sm hover-elevate-up transition-all">
+                            <div class="card-header border-0 pt-6">
+                                <h3 class="card-title">
+                                    <a href="{{ path('app_canal_view', {'id': canal.id}) }}" class="fw-bold fs-3 text-dark text-hover-primary">
+                                        {{ canal.nom }}
+                                    </a>
+                                </h3>
+                            </div>
+                            <div class="card-body py-5">
+                                <p class="text-gray-700 mb-4">{{ canal.description|length > 120 ? canal.description|slice(0,120) ~ '...' : canal.description }}</p>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        {% if canal.refUser %}
+                                            <div class="symbol symbol-35px symbol-circle me-2">
+                                            <span class="symbol-label bg-light-primary text-primary fw-bold">
+                                                {{ canal.refUser.userIdentifier|first|upper }}
+                                            </span>
+                                            </div>
+                                            <span class="text-muted fs-8">Créé par {{ canal.refUser.userIdentifier }}</span>
+                                        {% else %}
+                                            <span class="text-muted fs-8">Auteur inconnu</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <a href="{{ path('app_canal_view', {'id': canal.id}) }}" class="btn btn-sm btn-light-primary">
+                                        <i class="ki-duotone ki-message fs-2 me-1"></i> Ouvrir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <tr>
-                <td colspan="3"><em>Aucun canal trouvé.</em></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            <div class="alert alert-info d-flex align-items-center p-5">
+                <i class="ki-duotone ki-information fs-2hx me-3"></i>
+                <div class="d-flex flex-column">
+                    <h4 class="mb-1 text-info">Aucun canal trouvé</h4>
+                    <span>Commencez par en créer un pour lancer la discussion !</span>
+                </div>
+            </div>
+        {% endif %}
 
-    <a href="{{ path('app_canal_new') }}" class="btn btn-success">Créer un nouveau canal</a>
+    </div>
 {% endblock %}

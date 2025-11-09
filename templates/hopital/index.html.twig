@@ -1,37 +1,96 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hopital index{% endblock %}
+{% block title %}Gestion des Hôpitaux{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.css" rel="stylesheet">
+    <style>
+        .dt-search input {
+            border-radius: 0.475rem !important;
+            padding: 0.5rem 1rem;
+        }
+        .dt-length select {
+            border-radius: 0.475rem !important;
+            padding: 0.5rem 1rem;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Hopital index</h1>
+    <div class="d-flex justify-content-between align-items-center mb-6">
+        <h1 class="h2 mb-0">Gestion des Hôpitaux</h1>
+        <a href="{{ path('app_hopital_new') }}" class="btn btn-primary">
+            <i class="ki-duotone ki-plus fs-2"></i>
+            <span class="ms-1">Ajouter un hôpital</span>
+        </a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Commune</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for hopital in hopitals %}
-            <tr>
-                <td>{{ hopital.id }}</td>
-                <td>{{ hopital.nom }}</td>
-                <td>{{ hopital.commune }}</td>
-                <td>
-                    <a href="{{ path('app_hopital_show', {'id': hopital.id}) }}">show</a>
-                    <a href="{{ path('app_hopital_edit', {'id': hopital.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% if hopitals is empty %}
+        <div class="alert alert-light-info d-flex align-items-center p-5 mb-0">
+            <i class="ki-duotone ki-information-circle fs-2x text-info me-4"></i>
+            <div class="d-flex flex-column">
+                <span class="fw-bold fs-6">Aucun hôpital</span>
+                <span>Aucun hôpital n’a été enregistré pour le moment.</span>
+            </div>
+        </div>
+    {% else %}
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table id="kt_datatable_hopitaux" class="table align-middle table-row-dashed fs-6 gy-5 mb-0">
+                        <thead>
+                        <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                            <th class="min-w-60px">ID</th>
+                            <th class="min-w-180px">Nom</th>
+                            <th class="min-w-150px">Commune</th>
+                            <th class="text-end min-w-125px">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="fw-semibold text-gray-700">
+                        {% for hopital in hopitals %}
+                            <tr>
+                                <td>{{ hopital.id }}</td>
+                                <td><strong>{{ hopital.nom }}</strong></td>
+                                <td>{{ hopital.commune|default('—') }}</td>
+                                <td class="text-end">
+                                    <a href="{{ path('app_hopital_show', {'id': hopital.id}) }}"
+                                       class="btn btn-sm btn-outline-info">Voir</a>
+                                    <a href="{{ path('app_hopital_edit', {'id': hopital.id}) }}"
+                                       class="btn btn-sm btn-outline-warning">Modifier</a>
+                                    <form method="post" action="{{ path('app_hopital_delete', {'id': hopital.id}) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ hopital.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
 
-    <a href="{{ path('app_hopital_new') }}">Create new</a>
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof DataTable !== 'undefined') {
+                new DataTable('#kt_datatable_hopitaux', {
+                    responsive: true,
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/fr-FR.json'
+                    },
+                    order: [[0, 'asc']],
+                    columnDefs: [
+                        { orderable: true, targets: [0, 1, 2] },
+                        { orderable: false, targets: [3] }
+                    ]
+                });
+            }
+        });
+    </script>
 {% endblock %}

@@ -68,7 +68,6 @@ final class UserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        // Empêcher l'édition de soi-même (optionnel mais recommandé)
         if ($this->getUser() === $user) {
             $this->addFlash('warning', 'Vous ne pouvez pas modifier votre propre compte ici.');
             return $this->redirectToRoute('app_user_index');

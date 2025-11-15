@@ -64,6 +64,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $posteOccupe = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cvNomFichier = null;
+
+    public function getCvNomFichier(): ?string
+    {
+        return $this->cvNomFichier;
+    }
+
+    public function setCvNomFichier(?string $cv_NomFichier): void
+    {
+        $this->cvNomFichier = $cv_NomFichier;
+    }
+
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Hopital $refHopital = null;
 

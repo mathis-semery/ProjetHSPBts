@@ -71,12 +71,10 @@ class Hopital
 
     public function setRefUser(?User $refUser): static
     {
-        // unset the owning side of the relation if necessary
         if ($refUser === null && $this->refUser !== null) {
             $this->refUser->setRefHopital(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($refUser !== null && $refUser->getRefHopital() !== $this) {
             $refUser->setRefHopital($this);
         }

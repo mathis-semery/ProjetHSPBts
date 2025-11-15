@@ -67,7 +67,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Hopital $refHopital = null;
 
-    #[ORM\ManyToOne(inversedBy: 'usersrefEntreprise')]
+    #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Etablissement $refEtablissement = null;
 
     /**

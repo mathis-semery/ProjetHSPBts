@@ -23,6 +23,8 @@ class Entreprise
 
     #[ORM\Column(length: 255 , unique: true)]
     private ?string $siteWeb = null;
+    #[ORM\OneToOne(mappedBy: 'refEntreprise', cascade: ['persist', 'remove'])]
+    private ?User $refUser = null;
 
     /**
      * @var Collection<int, User>
@@ -102,6 +104,26 @@ class Entreprise
                 $user->setRefEntreptrise(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRefUser(): ?User
+    {
+        return $this->refUser;
+    }
+
+    public function setRefUser(?User $refUser): static
+    {
+        if ($refUser === null && $this->refUser !== null) {
+            $this->refUser->setrefEntreprise(null);
+        }
+
+        if ($refUser !== null && $refUser->getrefEntreprise() !== $this) {
+            $refUser->setrefEntreprise($this);
+        }
+
+        $this->refUser = $refUser;
 
         return $this;
     }

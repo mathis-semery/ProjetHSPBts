@@ -5,6 +5,9 @@
 parameters:
     nom_domaine: '%env(resolve:NOM_DOMAINE)%'
     mail_from: '%env(resolve:MAIL_FROM)%'
+    cv_directory: '%kernel.project_dir%/public/telecharger/cv'
+
+
 
 services:
     _defaults:

@@ -15,40 +15,60 @@ class UtilisateurController extends AbstractController
 {
     #[Route('/profile', name: 'app_profile', methods: ['GET', 'POST'])]
     public function profile(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
-{
-    $user = $this->getUser();
+    {
+        $user = $this->getUser();
 
-    if (!$user) {
-        throw $this->createAccessDeniedException();
-    }
-
-    $form = $this->createForm(UserType::class, $user, [
-        'profile_mode' => true,
-    ]);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $plainPassword = $form->get('password')->getData();
-
-
-        $plainPassword = $form->get('password')->getData();
-
-        if (!empty($plainPassword)) {
-            $hashed = $passwordHasher->hashPassword($user, $plainPassword);
-            $user->setPassword($hashed);
+        if (!$user) {
+            throw $this->createAccessDeniedException();
         }
 
+        $form = $this->createForm(UserType::class, $user, [
+            'profile_mode' => true,
+        ]);
+        $form->handleRequest($request);
 
-        $em->flush();
-        $this->addFlash('success', 'Profil mis à jour avec succès.');
-        return $this->redirectToRoute('app_profile');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('password')->getData();
 
+
+            $plainPassword = $form->get('password')->getData();
+
+            if (!empty($plainPassword)) {
+                $hashed = $passwordHasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashed);
+            }
+            if ($form->isSubmitted() && $form->isValid()) {
+
+                $cvNomFichier = $form->get('cvNomFichier')->getData();
+
+                if ($cvNomFichier) {
+                    $newNomFichier = uniqid().'.'.$cvNomFichier->guessExtension();
+
+                    try {
+                        $cvNomFichier->move(
+                            $this->getParameter('cv_directory'),
+                            $newNomFichier
+                        );
+                    } catch (FileException $e) {
+
+                    }
+
+                    $user->setcvNomFichier($newNomFichier);
+                }
+                $em->flush();
+                $this->addFlash('success', 'Profil mis à jour avec succès.');
+                return $this->redirectToRoute('app_profile');
+
+            }}
+        return $this->render('user/edit.html.twig', [
+            'user' => $user,
+            'form' => $form->createView(),
+
+        ]);
     }
-    return $this->render('user/edit.html.twig', [
-        'user' => $user,
-        'form' => $form->createView(),
-
-    ]);
 }
 
-}
+
+
+
+

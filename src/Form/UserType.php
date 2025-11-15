@@ -32,13 +32,13 @@ class UserType extends AbstractType
                     'mapped' => true,
                     'attr' => ['placeholder' => '********'],
                 ])
-                ->add('cv', FileType::class, [
+                ->add('cvNomFichier', FileType::class, [
                     'label' => 'CV (PDF)',
                     'mapped' => false,
                     'required' => false,
                     'constraints' => [
                         new File([
-                            'maxSize' => '5M',
+                            'maxSize' => '10M',
                             'mimeTypes' => [
                                 'application/pdf',
                                 'application/x-pdf',
@@ -52,13 +52,13 @@ class UserType extends AbstractType
                 ->add('email')
                 ->add('nom')
                 ->add('prenom')
-                ->add('cv', FileType::class, [
+                ->add('cvNomFichier', FileType::class, [
                     'label' => 'CV (PDF)',
                     'mapped' => false,
                     'required' => false,
                     'constraints' => [
                         new File([
-                            'maxSize' => '5M',
+                            'maxSize' => '100M',
                             'mimeTypes' => [
                                 'application/pdf',
                                 'application/x-pdf',
@@ -80,13 +80,13 @@ class UserType extends AbstractType
                     ->add('email')
                     ->add('nom')
                     ->add('prenom')
-                    ->add('cv', FileType::class, [
+                    ->add('cvNomFichier', FileType::class, [
                         'label' => 'CV (PDF)',
                         'mapped' => false,
                         'required' => false,
                         'constraints' => [
                             new File([
-                                'maxSize' => '5M',
+                                'maxSize' => '100M',
                                 'mimeTypes' => [
                                     'application/pdf',
                                     'application/x-pdf',

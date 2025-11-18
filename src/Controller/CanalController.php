@@ -74,7 +74,6 @@ class CanalController extends AbstractController
         if ($formPost->isSubmitted() && $formPost->isValid()) {
             $post->setRefUser($user);
             $post->setRefCanal($canal);
-            $post->setDateHeure(new \DateTime());
 
             $em->persist($post);
             $em->flush();
@@ -135,12 +134,18 @@ class CanalController extends AbstractController
     #[Route('/{id}/delete', name: 'app_canal_delete', methods: ['POST'])]
     public function delete(Request $request, Canal $canal, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && $canal->getRefUser() !== $user) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce canal.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$canal->getId(), $request->request->get('_token'))) {
             $em->remove($canal);
             $em->flush();
+            $this->addFlash('success', 'Canal supprimé !');
         }
 
         return $this->redirectToRoute('app_canal_index');
     }
-
 }

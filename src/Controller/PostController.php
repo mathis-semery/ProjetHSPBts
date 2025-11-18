@@ -68,14 +68,18 @@ final class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_post_delete', methods: ['POST'])]
-    public function delete(Request $request, Post $post, EntityManagerInterface $entityManager): Response
+    #[Route('/post/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
+    public function delete(Post $post, Request $request, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($post);
-            $entityManager->flush();
+        if ($this->isGranted('ROLE_ADMIN') || $post->getRefUser() === $this->getUser()) {
+            if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+                $em->remove($post);
+                $em->flush();
+            }
+        } else {
+            $this->addFlash('error', 'Vous n’avez pas le droit de supprimer ce post.');
         }
 
-        return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_canal_view', ['id' => $post->getRefCanal()->getId()]);
     }
 }

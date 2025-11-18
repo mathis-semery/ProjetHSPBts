@@ -68,14 +68,18 @@ final class ReponseController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_reponse_delete', methods: ['POST'])]
-    public function delete(Request $request, Reponse $reponse, EntityManagerInterface $entityManager): Response
+    #[Route('/reponse/{id}/delete', name: 'app_reponse_delete', methods: ['POST'])]
+    public function delete(Reponse $reponse, Request $request, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$reponse->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($reponse);
-            $entityManager->flush();
+        if ($this->isGranted('ROLE_ADMIN') || $reponse->getRefUser() === $this->getUser()) {
+            if ($this->isCsrfTokenValid('delete'.$reponse->getId(), $request->request->get('_token'))) {
+                $em->remove($reponse);
+                $em->flush();
+            }
+        } else {
+            $this->addFlash('error', 'Vous n’avez pas le droit de supprimer cette réponse.');
         }
 
-        return $this->redirectToRoute('app_reponse_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_canal_view', ['id' => $reponse->getRefPost()->getRefCanal()->getId()]);
     }
 }

@@ -131,21 +131,42 @@ class CanalController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_canal_delete', methods: ['POST'])]
-    public function delete(Request $request, Canal $canal, EntityManagerInterface $em): Response
+    #[Route('/post/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
+    public function deletePost(Request $request, Post $post, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
 
-        if (!in_array('ROLE_ADMIN', $user->getRoles()) && $canal->getRefUser() !== $user) {
-            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce canal.');
+        if (!$user) {
+            throw $this->createAccessDeniedException();
         }
 
-        if ($this->isCsrfTokenValid('delete'.$canal->getId(), $request->request->get('_token'))) {
-            $em->remove($canal);
-            $em->flush();
-            $this->addFlash('success', 'Canal supprimé !');
+        // Autoriser seulement l'auteur ou l'admin
+        if ($post->getRefUser() === $user || in_array('ROLE_ADMIN', $user->getRoles())) {
+            if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+                $em->remove($post);
+                $em->flush();
+            }
         }
 
-        return $this->redirectToRoute('app_canal_index');
+        return $this->redirectToRoute('app_canal_view', ['id' => $post->getCanal()->getId()]);
+    }
+
+    #[Route('/reponse/{id}/delete', name: 'app_reponse_delete', methods: ['POST'])]
+    public function deleteReponse(Request $request, Reponse $reponse, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($reponse->getRefUser() === $user || in_array('ROLE_ADMIN', $user->getRoles())) {
+            if ($this->isCsrfTokenValid('delete'.$reponse->getId(), $request->request->get('_token'))) {
+                $em->remove($reponse);
+                $em->flush();
+            }
+        }
+
+        return $this->redirectToRoute('app_canal_view', ['id' => $reponse->getPost()->getCanal()->getId()]);
     }
 }

@@ -34,10 +34,11 @@
 
                                 {% if app.user and (app.user == canal.refUser or 'ROLE_ADMIN' in app.user.roles) %}
                                     <a href="{{ path('app_canal_edit', {'id': canal.id}) }}"
-                                       class="btn btn-sm btn-warning fw-bold">
+                                       class="btn btn-sm btn-light-warning border-warning fw-semibold">
                                         <i class="ki-duotone ki-pencil fs-3 me-1"></i>
                                         Modifier
                                     </a>
+
                                 {% endif %}
                             </div>
 

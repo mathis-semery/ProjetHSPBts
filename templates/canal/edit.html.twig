@@ -26,18 +26,19 @@
                 </div>
 
                 <div class="mb-7">
-                    {{ form_label(form.ListeAuto, 'Liste automatique', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_label(form.ListeAuto, 'Liste automatique (métiers)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
                     {{ form_widget(form.ListeAuto, {'attr': {'class': 'form-control form-control-solid'}}) }}
                     {{ form_errors(form.ListeAuto) }}
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <form method="post" action="{{ path('app_canal_delete', {'id': canal.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ canal.id) }}">
-                        <button class="btn btn-danger">
-                            <i class="ki-duotone ki-trash fs-2 me-2"></i>Supprimer
-                        </button>
-                    </form>
+
+                    <button type="button"
+                            class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
+                        Supprimer ce canal
+                    </button>
 
                     <div>
                         <a href="{{ path('app_canal_index') }}" class="btn btn-light me-3">Annuler</a>
@@ -51,4 +52,38 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Supprimer ce canal ?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="fs-5 fw-semibold text-gray-700">
+                        Cette action est <span class="text-danger fw-bold">définitive</span>.<br>
+                        Voulez-vous vraiment supprimer le canal :
+                    </p>
+                    <p class="fs-4 fw-bold text-dark mb-0">“{{ canal.nom }}”</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+
+                    <form method="post" action="{{ path('app_canal_delete', {'id': canal.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ canal.id) }}">
+                        <button class="btn btn-danger">
+                            <i class="ki-duotone ki-trash fs-2 me-1"></i>
+                            Confirmer la suppression
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

@@ -1,89 +1,366 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GDH – Plateforme de mise en relation entre médecins, étudiants en médecine et entreprises partenaires.">
+    <title>GDH – Générale des Hôpitaux</title>
 
-{% block title %}Accueil - GDH Console{% endblock %}
+    <link rel="icon" href="{{ asset('assets/media/logooo.png') }}" type="image/png">
 
-{% block body %}
-    <h1 class="mb-6">Bienvenue sur le tableau de bord de l'hôpital</h1>
+    <!-- Bootstrap 5 CSS (CDN – facile à remplacer par asset local) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome pour les icônes médicales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts : Montserrat (propre, lisible) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <div class="row g-4 mb-8">
-        <!-- Statistiques rapides -->
-        <div class="col-md-3">
-            <div class="card text-white bg-primary h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Patients</h5>
-                    <p class="card-text display-6">124</p>
-                </div>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8fafc;
+            color: #2d3748;
+        }
+        header .navbar-brand {
+            font-weight: 700;
+            color: #1a202c;
+        }
+        .hero {
+            background: linear-gradient(rgba(0, 40, 80, 0.8), rgba(0, 40, 80, 0.9)),
+            url('{{ asset('build/images/hero-hospital.jpg') }}') no-repeat center center/cover;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        .section-title {
+            position: relative;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: skyblue;
+            border-radius: 2px;
+        }
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin: 0 auto 1rem;
+        }
+        .btn-primary { background-color: skyblue; border-color: skyblue; }
+        .btn-primary:hover { background-color: skyblue; }
+        .btn-success { background-color: #0ea5e9; border-color: #0284c7; }
+        .btn-success:hover { background-color: #0284c7; }
+        .btn-info { background-color: skyblue; border-color: skyblue; color: white; }
+        .btn-info:hover { background-color: skyblue; }
+        footer {
+            background-color: #0f172a;
+            color: #cbd5e1;
+            padding: 2.5rem 0 1.5rem;
+        }
+        .map-placeholder {
+            background-color: #e2e8f0;
+            border: 1px dashed #94a3b8;
+            border-radius: 8px;
+            height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #64748b;
+        }
+        .news-item, .event-item {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .news-item:hover, .event-item:hover {
+            border-left-color: skyblue;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="bg-white shadow-sm">
+    <nav class="container navbar navbar-expand-lg">
+        <div class="d-flex align-items-center">
+            <div class="bg-green-600 text-white rounded-circle d-flex align-items-center justify-content-center"
+                 style="width: 42px; height: 42px; background-color: skyblue;">
+                <span class="fw-bold">GDH</span>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Médecins</h5>
-                    <p class="card-text display-6">23</p>
+        <div>
+            <a href="/inscription" class="btn btn-outline-secondary me-2">Connexion</a>
+            <a href="/register" class="btn btn-primary">Inscription</a>
+        </div>
+    </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Bienvenue dans l’écosystème GDH</h1>
+        <p class="fs-5 mb-4 opacity-90">Premier groupe de cliniques et hôpitaux privés en France — 70 ans d’expertise au service de la santé</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3 mt-3">
+            <a href="#" class="btn btn-light btn-lg px-5">
+                <i class="fas fa-user-graduate me-2"></i> Étudiant
+            </a>
+            <a href="#" class="btn btn-success btn-lg px-5 text-white">
+                <i class="fas fa-building me-2"></i> Entreprise
+            </a>
+            <a href="#" class="btn btn-info btn-lg px-5">
+                <i class="fas fa-user-md me-2"></i> Médecin
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Présentation du groupe GDH -->
+<section class="py-6">
+    <div class="container">
+        <h2 class="section-title text-center">Le groupe GDH</h2>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <p class="lead">
+                    Créée en <strong>1954</strong> à Paris, la <strong>Générale des Hôpitaux (GDH)</strong> est le <strong>premier groupe privé de santé en France</strong>.
+                </p>
+                <p>
+                    Fort de <strong>70 ans d’expérience</strong>, GDH rassemble aujourd’hui <strong>9 hôpitaux</strong> répartis sur tout le territoire.
+                </p>
+                <p>
+                    L’un de ses établissements phares, l’<strong>Hôpital Sud Paris (HSP)</strong>, inauguré en <strong>1995</strong> à Marreuil-sur-Seine, dispose de :
+                </p>
+                <ul class="list-unstyled">
+                    <li class="d-flex align-items-start mb-2">
+                        <i class="fas fa-check text-success me-2 mt-1"></i>
+                        <span><strong>90 praticiens</strong></span>
+                    </li>
+                    <li class="d-flex align-items-start mb-2">
+                        <i class="fas fa-check text-success me-2 mt-1"></i>
+                        <span><strong>289 lits</strong></span>
+                    </li>
+                    <li class="d-flex align-items-start mb-2">
+                        <i class="fas fa-check text-success me-2 mt-1"></i>
+                        <span><strong>6 pôles médicaux</strong> : chirurgie, médecine, cancérologie, maternité, imagerie médicale, urgences 24h/24</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <div class="ratio ratio-16x9 bg-light border rounded">
+                    <img src="{{ asset('assets/media/P_20180602_103845.jpg') }}"
+                         alt="Hôpital Sud Paris – Façade"
+                         class="object-fit-cover w-100 h-100 rounded"
+                         onerror="this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center h-100 w-100 text-muted\'>Image non disponible</div>'">
                 </div>
+                <small class="text-muted d-block text-center mt-2">Hôpital Sud Paris (HSP) – Inauguré en 1995</small>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Chambres disponibles</h5>
-                    <p class="card-text display-6">12</p>
+    </div>
+</section>
+
+<!-- Objectifs de la plateforme -->
+<section class="py-6 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center">Objectif de cette plateforme</h2>
+        <p class="text-center mb-5">Renforcer les liens entre trois acteurs clés de l’écosystème santé :</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center p-4">
+                    <div class="card-icon bg-light text-success" style="background-color:#dcfce7;">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h5 class="fw-bold">Médecins du groupe</h5>
+                    <p class="text-muted">
+                        Maintenir le contact, organiser des événements, participer à l’encadrement des futurs professionnels.
+                    </p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Alertes</h5>
-                    <p class="card-text display-6">3</p>
+            <div class="col-md-4">
+                <div class="text-center p-4">
+                    <div class="card-icon bg-light text-primary" style="background-color:#dbeafe;">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h5 class="fw-bold">Étudiants en médecine</h5>
+                    <p class="text-muted">
+                        Accès à des stages, alternances, emplois, événements et mentorat dès la formation.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center p-4">
+                    <div class="card-icon bg-light text-info" style="background-color:#dcf3f3;">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h5 class="fw-bold">Entreprises partenaires</h5>
+                    <p class="text-muted">
+                        Recruter des talents, co-organiser des événements, valoriser leurs innovations.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Actions rapides -->
-    <div class="mb-8">
-        <h3 class="mb-4">Actions rapides</h3>
-        <div class="d-flex gap-3 flex-wrap">
-            <a href="{{ path('app_home') }}" class="btn btn-primary btn-lg">Gérer les patients</a>
-            <a href="{{ path('app_home') }}" class="btn btn-success btn-lg">Gérer les médecins</a>
-            <a href="{{ path('app_home') }}" class="btn btn-warning btn-lg">Gérer les chambres</a>
-            <a href="{{ path('app_home') }}" class="btn btn-danger btn-lg">Voir les alertes</a>
+<!-- Réseau national (9 hôpitaux) -->
+<section class="py-6">
+    <div class="container">
+        <h2 class="section-title text-center">Notre réseau national</h2>
+        <p class="text-center mb-5">GDH compte <strong>9 hôpitaux</strong> stratégiquement situés en France métropolitaine :</p>
+
+
+    </div>
+</section>
+
+{#<!-- Actualités & Événements (section dynamique) -->#}
+{#<section class="py-6 bg-light">#}
+{#    <div class="container">#}
+{#        <div class="d-flex justify-content-between align-items-center mb-5">#}
+{#            <h2 class="section-title mb-0">Actualités & Événements</h2>#}
+{#            <a href="#" class="text-muted">Voir tout →</a>#}
+{#        </div>#}
+
+{#        <div class="row g-5">#}
+{#            <!-- Actualités -->#}
+{#            <div class="col-lg-6">#}
+{#                <h5 class="fw-bold text-success mb-3"><i class="fas fa-bullhorn me-2"></i> Dernières actualités</h5>#}
+{#                {% if actualites is not empty %}#}
+{#                    {% for actualite in actualites|slice(0, 3) %}#}
+{#                        <div class="news-item">#}
+{#                            <h6 class="mb-1">#}
+{#                                {% if actualite.titre|length > 70 %}#}
+{#                                    {{ actualite.titre|slice(0, 67) }}…#}
+{#                                {% else %}#}
+{#                                    {{ actualite.titre }}#}
+{#                                {% endif %}#}
+{#                            </h6>#}
+{#                            <small class="text-muted">#}
+{#                                Publié le {{ actualite.datePublication|date('d/m/Y') }}#}
+{#                            </small>#}
+{#                            <p class="mt-1 text-muted">#}
+{#                                {% set contenu = actualite.contenu|striptags %}#}
+{#                                {% if contenu|length > 120 %}#}
+{#                                    {{ contenu|slice(0, 117) }}…#}
+{#                                {% else %}#}
+{#                                    {{ contenu }}#}
+{#                                {% endif %}#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    {% endfor %}#}
+{#                {% else %}#}
+{#                    <p class="text-muted fst-italic">Aucune actualité pour le moment.</p>#}
+{#                {% endif %}#}
+{#            </div>#}
+
+{#            <!-- Événements -->#}
+{#            <div class="col-lg-6">#}
+{#                <h5 class="fw-bold text-info mb-3"><i class="fas fa-calendar-day me-2"></i> Prochains événements</h5>#}
+{#                {% if evenements is not empty %}#}
+{#                    {% for evenement in evenements|slice(0, 3) %}#}
+{#                        <div class="event-item">#}
+{#                            <h6 class="mb-1">#}
+{#                                {% if evenement.titre|length > 60 %}#}
+{#                                    {{ evenement.titre|slice(0, 57) }}…#}
+{#                                {% else %}#}
+{#                                    {{ evenement.titre }}#}
+{#                                {% endif %}#}
+{#                            </h6>#}
+{#                            <small class="text-muted d-block">#}
+{#                                <i class="fas fa-map-marker-alt me-1"></i>#}
+{#                                {% if evenement.lieu|length > 40 %}#}
+{#                                    {{ evenement.lieu|slice(0, 37) }}…#}
+{#                                {% else %}#}
+{#                                    {{ evenement.lieu }}#}
+{#                                {% endif %}#}
+{#                            </small>#}
+{#                            <small class="text-success d-block">#}
+{#                                <i class="far fa-calendar me-1"></i>#}
+{#                                Du {{ evenement.dateDebut|date('d/m') }} au {{ evenement.dateFin|date('d/m/Y') }}#}
+{#                            </small>#}
+{#                            <p class="mt-1 text-muted">#}
+{#                                {% set desc = evenement.description|striptags %}#}
+{#                                {% if desc|length > 100 %}#}
+{#                                    {{ desc|slice(0, 97) }}…#}
+{#                                {% else %}#}
+{#                                    {{ desc }}#}
+{#                                {% endif %}#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    {% endfor %}#}
+{#                {% else %}#}
+{#                    <p class="text-muted fst-italic">Aucun événement à venir.</p>#}
+{#                {% endif %}#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</section>#}
+
+<!-- CTA finale -->
+<section class="py-6 text-center text-white" style="background: linear-gradient(135deg, skyblue, skyblue);">
+    <div class="container">
+        <br>
+        <h2 class="fw-bold mb-3">Rejoignez la communauté GDH</h2>
+        <p class="fs-5 opacity-90 mb-4">
+            Ensemble, construisons une santé connectée, innovante et humaine.
+        </p>
+        <br>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-bold">Générale des Hôpitaux</h5>
+                <p class="small">
+                    Premier groupe de cliniques et hôpitaux privés en France.<br>
+                    Siège social : Paris<br>
+                    © {{ 'now'|date('Y') }} – Tous droits réservés
+                </p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-bold">Liens utiles</h5>
+                <ul class="list-unstyled small">
+                    <li><a href="#" class="text-light text-decoration-none">Mentions légales</a></li>
+                    <li><a href="#" class="text-light text-decoration-none">Politique de confidentialité</a></li>
+                    <li><a href="#" class="text-light text-decoration-none">CGU</a></li>
+                    <li><a href="#" class="text-light text-decoration-none">Contact & Support</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-bold">Contact</h5>
+                <address class="small text-light">
+                    📧 contact@gdh.fr<br>
+                    📞 +33 1 XX XX XX XX<br>
+                    🔒 Site sécurisé (SSL/TLS)
+                </address>
+            </div>
+        </div>
+        <hr class="border-secondary">
+        <div class="text-center small text-light">
+            Conforme RGPD – Plateforme développée pour le groupe GDH
         </div>
     </div>
+</footer>
 
-    <!-- Dernières actions / activité -->
-    <div>
-        <h3 class="mb-4">Dernières activités</h3>
-        <table class="table table-striped table-hover">
-            <thead>
-            <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Utilisateur</th>
-                <th scope="col">Action</th>
-                <th scope="col">Détails</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>22/10/2025 10:45</td>
-                <td>Dr. Dupont</td>
-                <td>Ajout patient</td>
-                <td>Patient Jean Martin enregistré</td>
-            </tr>
-            <tr>
-                <td>22/10/2025 09:30</td>
-                <td>Infirmière Claire</td>
-                <td>Mise à jour chambre</td>
-                <td>Chambre 203 libérée</td>
-            </tr>
-            <tr>
-                <td>21/10/2025 16:20</td>
-                <td>Admin</td>
-                <td>Création compte médecin</td>
-                <td>Dr. Laura Petit ajouté</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-{% endblock %}
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

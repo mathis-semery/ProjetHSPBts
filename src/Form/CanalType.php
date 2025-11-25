@@ -28,7 +28,7 @@ class CanalType extends AbstractType
                     'Etudiant' => 'ETUDIANT',
                 ],
                 'multiple' => true,  // permet de sélectionner plusieurs rôles
-                'expanded' => false, // true = checkboxes, false = select multiple
+                'expanded' => true, // true = checkboxes, false = select multiple
                 'required' => false,
                 'label' => 'Liste automatique (Rôles)',
                 'attr' => ['class' => 'form-select'],

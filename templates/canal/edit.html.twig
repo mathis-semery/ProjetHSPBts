@@ -26,13 +26,14 @@
                 </div>
 
                 <div class="mb-7">
-                    {{ form_label(form.ListeAuto, 'Liste automatique (métiers)', {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.ListeAuto, {'attr': {'class': 'form-control form-control-solid'}}) }}
+                    {{ form_label(form.ListeAuto, 'Rôles autorisés', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.ListeAuto, {'attr': {'class': 'form-select', 'multiple': 'multiple'}}) }}
+                    <small class="text-muted">Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs rôles</small>
                     {{ form_errors(form.ListeAuto) }}
                 </div>
 
                 <div class="d-flex justify-content-between">
-
+                    <!-- Bouton suppression avec modal -->
                     <button type="button"
                             class="btn btn-danger"
                             data-bs-toggle="modal"
@@ -42,9 +43,7 @@
 
                     <div>
                         <a href="{{ path('app_canal_index') }}" class="btn btn-light me-3">Annuler</a>
-                        <button class="btn btn-primary">
-                            <i class="ki-duotone ki-check fs-2 me-2"></i>Enregistrer
-                        </button>
+                        <button class="btn btn-primary">Enregistrer les modifications</button>
                     </div>
                 </div>
 
@@ -53,6 +52,7 @@
         </div>
     </div>
 
+    <!-- Modal suppression -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -73,10 +73,9 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
 
-                    <form method="post" action="{{ path('app_canal_edit', {'id': canal.id}) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('edit' ~ canal.id) }}">
+                    <form method="post" action="{{ path('app_canal_delete', {'id': canal.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ canal.id) }}">
                         <button class="btn btn-danger">
-                            <i class="ki-duotone ki-trash fs-2 me-1"></i>
                             Confirmer la suppression
                         </button>
                     </form>

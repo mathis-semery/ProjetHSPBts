@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Canal;
+use App\Entity\Post;
+use App\Entity\Reponse;
 use App\Form\CanalType;
+use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,13 +23,11 @@ class CanalController extends AbstractController
         $canals = $em->getRepository(Canal::class)->findAll();
 
         $visibleCanals = array_filter($canals, function(Canal $canal) use ($user) {
-            // Les admins voient tout
             if (in_array('ROLE_ADMIN', $user->getRoles())) {
-                return true;
+                return true; // Admin voit tout
             }
-
-            $rolesAutorises = $canal->getListeAuto() ?? []; // tableau de rôles
-            return in_array($user->getMetier(), $rolesAutorises) || $canal->getRefUser() === $user;
+            $metiers = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
+            return in_array($user->getMetier(), $metiers) || $canal->getRefUser() === $user;
         });
 
         return $this->render('canal/index.html.twig', [
@@ -44,9 +45,6 @@ class CanalController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si ListeAuto est en string, transformer en CSV
-            // $canal->setListeAuto(implode(',', $form->get('ListeAuto')->getData()));
-
             $em->persist($canal);
             $em->flush();
             $this->addFlash('success', 'Canal créé !');
@@ -55,7 +53,61 @@ class CanalController extends AbstractController
         }
 
         return $this->render('canal/new.html.twig', [
+            'canal' => $canal,
             'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/{id}/view', name: 'app_canal_view', methods: ['GET','POST'])]
+    public function view(Request $request, Canal $canal, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles())) {
+            $metiers = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
+            if (!in_array($user->getMetier(), $metiers) && $canal->getRefUser() !== $user) {
+                throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à ce canal.');
+            }
+        }
+
+        // Formulaire création post
+        $post = new Post();
+        $formPost = $this->createForm(PostType::class, $post);
+        $formPost->handleRequest($request);
+
+        if ($formPost->isSubmitted() && $formPost->isValid()) {
+            $post->setRefUser($user);
+            $post->setCanal($canal);
+
+            $em->persist($post);
+            $em->flush();
+
+            return $this->redirectToRoute('app_canal_view', ['id' => $canal->getId()]);
+        }
+
+        // Formulaire réponse à un post
+        if ($request->isMethod('POST') && $request->request->has('texte') && $request->request->has('post_id')) {
+            $texte = trim($request->request->get('texte'));
+            $postId = $request->request->getInt('post_id');
+            $parentPost = $em->getRepository(Post::class)->find($postId);
+
+            if ($texte !== '' && $parentPost) {
+                $reponse = new Reponse();
+                $reponse->setRefUser($user);
+                $reponse->setRefPost($parentPost);
+                $reponse->setTexte($texte);
+                $reponse->setDateHeure(new \DateTime());
+
+                $em->persist($reponse);
+                $em->flush();
+
+                return $this->redirectToRoute('app_canal_view', ['id' => $canal->getId()]);
+            }
+        }
+
+        return $this->render('canal/view.html.twig', [
+            'canal' => $canal,
+            'formPost' => $formPost->createView(),
         ]);
     }
 
@@ -82,5 +134,37 @@ class CanalController extends AbstractController
             'canal' => $canal,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/post/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
+    public function deletePost(Request $request, Post $post, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) throw $this->createAccessDeniedException();
+
+        if ($post->getRefUser() === $user || in_array('ROLE_ADMIN', $user->getRoles())) {
+            if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+                $em->remove($post);
+                $em->flush();
+            }
+        }
+
+        return $this->redirectToRoute('app_canal_view', ['id' => $post->getCanal()->getId()]);
+    }
+
+    #[Route('/reponse/{id}/delete', name: 'app_reponse_delete', methods: ['POST'])]
+    public function deleteReponse(Request $request, Reponse $reponse, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) throw $this->createAccessDeniedException();
+
+        if ($reponse->getRefUser() === $user || in_array('ROLE_ADMIN', $user->getRoles())) {
+            if ($this->isCsrfTokenValid('delete'.$reponse->getId(), $request->request->get('_token'))) {
+                $em->remove($reponse);
+                $em->flush();
+            }
+        }
+
+        return $this->redirectToRoute('app_canal_view', ['id' => $reponse->getRefPost()->getCanal()->getId()]);
     }
 }

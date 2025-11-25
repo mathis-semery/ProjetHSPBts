@@ -73,8 +73,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
 
-                    <form method="post" action="{{ path('app_canal_delete', {'id': canal.id}) }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ canal.id) }}">
+                    <form method="post" action="{{ path('app_canal_edit', {'id': canal.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('edit' ~ canal.id) }}">
                         <button class="btn btn-danger">
                             <i class="ki-duotone ki-trash fs-2 me-1"></i>
                             Confirmer la suppression

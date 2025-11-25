@@ -5,28 +5,33 @@ namespace App\Form;
 use App\Entity\Canal;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class CanalType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom', TextType::class, [
+            ->add('nom', null, [
                 'label' => 'Nom du canal',
-                'attr' => ['placeholder' => 'Entrez le nom du canal']
+                'attr' => ['class' => 'form-control form-control-solid', 'placeholder' => 'Ex : Général, Annonces...'],
             ])
-            ->add('description', TextareaType::class, [
+            ->add('description', null, [
                 'label' => 'Description',
-                'required' => false,
-                'attr' => ['placeholder' => 'Description du canal', 'rows' => 4]
+                'attr' => ['class' => 'form-control form-control-solid', 'placeholder' => 'Décrivez le but du canal...'],
             ])
-            ->add('ListeAuto', TextType::class, [
-                'label' => 'Liste automatique (métiers)',
+            ->add('ListeAuto', ChoiceType::class, [
+                'choices'  => [
+                    'Médecin' => 'MEDECIN',
+                    'Partenaire' => 'PARTENAIRE',
+                    'Etudiant' => 'ETUDIANT',
+                ],
+                'multiple' => true,  // permet de sélectionner plusieurs rôles
+                'expanded' => false, // true = checkboxes, false = select multiple
                 'required' => false,
-                'attr' => ['placeholder' => 'Ex: Medecin, Infirmier, Administratif']
+                'label' => 'Liste automatique (Rôles)',
+                'attr' => ['class' => 'form-select'],
             ]);
     }
 

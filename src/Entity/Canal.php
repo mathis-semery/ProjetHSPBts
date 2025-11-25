@@ -23,8 +23,8 @@ class Canal
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $ListeAuto = null;
+    #[ORM\Column(type: 'json', nullable: true)]
+    private array $ListeAuto = [];
 
     #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $users;
@@ -52,8 +52,16 @@ class Canal
     public function getDescription(): ?string { return $this->description; }
     public function setDescription(?string $description): static { $this->description = $description; return $this; }
 
-    public function getListeAuto(): ?string { return $this->ListeAuto; }
-    public function setListeAuto(?string $ListeAuto): static { $this->ListeAuto = $ListeAuto; return $this; }
+    public function getListeAuto(): ?array
+    {
+        return $this->ListeAuto;
+    }
+
+    public function setListeAuto(?array $ListeAuto): static
+    {
+        $this->ListeAuto = $ListeAuto;
+        return $this;
+    }
 
     public function getPosts(): Collection { return $this->posts; }
     public function addPost(Post $post): static

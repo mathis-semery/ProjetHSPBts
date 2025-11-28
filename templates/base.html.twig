@@ -7,17 +7,20 @@
     {% include 'partials/_head_assets.html.twig' %}
     {% block stylesheets %}{% endblock %}
 </head>
-<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled d-flex flex-column min-vh-100">
+<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed d-flex flex-column min-vh-100">
 {% include 'partials/_header.html.twig' %}
 
 <main id="main" class="bg-light flex-grow-1">
-    <div class="container-xxl py-8 h-100 d-flex">
-        <div class="card shadow-sm border-0 rounded-3 flex-grow-1">
-            <div class="card-body p-6 p-lg-10">
-                {% block body %}{% endblock %}
+    {% block content_wrapper %}
+        {# Layout avec card par défaut pour les pages CRUD #}
+        <div class="container-xxl py-8 h-100 d-flex">
+            <div class="card shadow-sm border-0 rounded-3 flex-grow-1">
+                <div class="card-body p-6 p-lg-10">
+                    {% block body %}{% endblock %}
+                </div>
             </div>
         </div>
-    </div>
+    {% endblock %}
 </main>
 
 {% include 'partials/_footer.html.twig' %}

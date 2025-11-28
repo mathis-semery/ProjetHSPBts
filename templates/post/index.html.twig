@@ -1,39 +1,120 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Post index{% endblock %}
+{% block title %}Publications{% endblock %}
 
 {% block body %}
-    <h1>Post index</h1>
+    <div class="container py-10">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Texte</th>
-                <th>DateHeure</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for post in posts %}
-            <tr>
-                <td>{{ post.id }}</td>
-                <td>{{ post.titre }}</td>
-                <td>{{ post.texte }}</td>
-                <td>{{ post.dateHeure ? post.dateHeure|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_post_show', {'id': post.id}) }}">show</a>
-                    <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
-                </td>
-            </tr>
+        <!-- Header -->
+        <div class="card mb-10">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div>
+                    <h1 class="fs-2hx fw-bold text-dark mb-2">Publications</h1>
+                    <p class="text-gray-600 mb-0">Partagez vos actualités et informations avec la communauté.</p>
+                </div>
+
+                {% if app.user %}
+                    <a href="{{ path('app_post_new') }}" class="btn btn-primary mt-4 mt-md-0">
+                        <i class="ki-duotone ki-plus fs-2"></i>
+                        Nouvelle publication
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if posts is not empty %}
+            <div class="row g-6">
+                {% for post in posts %}
+                    <div class="col-12">
+                        <div class="card card-flush shadow-sm hover-elevate-up transition-all">
+                            <div class="card-header border-0 pt-6">
+                                <div class="d-flex justify-content-between align-items-start w-100">
+                                    <div class="flex-grow-1">
+                                        <h3 class="card-title">
+                                            <a href="{{ path('app_post_show', {'id': post.id}) }}" class="fw-bold fs-3 text-dark text-hover-primary">
+                                                {{ post.titre }}
+                                            </a>
+                                        </h3>
+
+                                        <!-- Date et heure -->
+                                        {% if post.dateHeure %}
+                                            <div class="d-flex align-items-center mt-2">
+                                                <i class="ki-duotone ki-calendar fs-2 text-gray-500 me-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                                <span class="text-muted fs-7">
+                                                    {{ post.dateHeure|date('d/m/Y à H:i') }}
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if app.user and (post.refUser == app.user or 'ROLE_ADMIN' in app.user.roles) %}
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="ki-duotone ki-pencil fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="card-body py-5">
+                                <!-- Texte de la publication -->
+                                <p class="text-gray-700">
+                                    {{ post.texte|length > 200 ? post.texte|slice(0,200) ~ '...' : post.texte }}
+                                </p>
+
+                                <!-- Auteur -->
+                                <div class="d-flex align-items-center mt-4">
+                                    {% if post.refUser %}
+                                        <div class="symbol symbol-35px symbol-circle me-2">
+                                            <span class="symbol-label bg-light-primary text-primary fw-bold">
+                                                {{ post.refUser.userIdentifier|first|upper }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-800 fw-semibold">{{ post.refUser.nom }} {{ post.refUser.prenom }}</span>
+                                            <span class="text-muted fs-8 d-block">{{ post.refUser.userIdentifier }}</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted fs-8">Auteur inconnu</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="mt-4">
+                                    <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-sm btn-light-primary">
+                                        <i class="ki-duotone ki-eye fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Lire la suite
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            <div class="alert alert-info d-flex align-items-center p-5">
+                <i class="ki-duotone ki-information-5 fs-2hx text-info me-4">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                <div class="d-flex flex-column">
+                    <h4 class="mb-1 text-info">Aucune publication</h4>
+                    <span>Aucune publication n'a encore été créée. Soyez le premier à partager !</span>
+                </div>
+            </div>
+        {% endif %}
 
-    <a href="{{ path('app_post_new') }}">Create new</a>
+    </div>
 {% endblock %}

@@ -1,131 +1,34 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="GDH – Plateforme de mise en relation entre médecins, étudiants en médecine et entreprises partenaires.">
-    <title>GDH – Générale des Hôpitaux</title>
+{% extends 'base.html.twig' %}
 
-    <link rel="icon" href="{{ asset('assets/media/logooo.png') }}" type="image/png">
+{% block title %}GDH – Générale des Hôpitaux{% endblock %}
 
-    <!-- Bootstrap 5 CSS (CDN – facile à remplacer par asset local) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome pour les icônes médicales -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Google Fonts : Montserrat (propre, lisible) -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% block stylesheets %}
+    <!-- Leaflet CSS pour la carte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Styles spécifiques à la page home -->
+    <link rel="stylesheet" href="{{ asset('assets/css/home.css') }}">
+{% endblock %}
 
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f8fafc;
-            color: #2d3748;
-        }
-        header .navbar-brand {
-            font-weight: 700;
-            color: #1a202c;
-        }
-        .hero {
-            background: linear-gradient(rgba(0, 40, 80, 0.8), rgba(0, 40, 80, 0.9)),
-            url('{{ asset('build/images/hero-hospital.jpg') }}') no-repeat center center/cover;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-        }
-        .section-title {
-            position: relative;
-            margin-bottom: 2rem;
-            font-weight: 600;
-            color: #2d3748;
-        }
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background: skyblue;
-            border-radius: 2px;
-        }
-        .card-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            margin: 0 auto 1rem;
-        }
-        .btn-primary { background-color: skyblue; border-color: skyblue; }
-        .btn-primary:hover { background-color: skyblue; }
-        .btn-success { background-color: #0ea5e9; border-color: #0284c7; }
-        .btn-success:hover { background-color: #0284c7; }
-        .btn-info { background-color: skyblue; border-color: skyblue; color: white; }
-        .btn-info:hover { background-color: skyblue; }
-        footer {
-            background-color: #0f172a;
-            color: #cbd5e1;
-            padding: 2.5rem 0 1.5rem;
-        }
-        .map-placeholder {
-            background-color: #e2e8f0;
-            border: 1px dashed #94a3b8;
-            border-radius: 8px;
-            height: 260px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-style: italic;
-            color: #64748b;
-        }
-        .news-item, .event-item {
-            border-left: 3px solid #e2e8f0;
-            padding-left: 1rem;
-            margin-bottom: 1.2rem;
-        }
-        .news-item:hover, .event-item:hover {
-            border-left-color: skyblue;
-        }
-    </style>
-</head>
-<body>
-
-<!-- Header -->
-<header class="bg-white shadow-sm">
-    <nav class="container navbar navbar-expand-lg">
-        <div class="d-flex align-items-center">
-            <div class="bg-green-600 text-white rounded-circle d-flex align-items-center justify-content-center"
-                 style="width: 42px; height: 42px; background-color: skyblue;">
-                <span class="fw-bold">GDH</span>
-            </div>
-        </div>
-        <div>
-            <a href="/inscription" class="btn btn-outline-secondary me-2">Connexion</a>
-            <a href="/register" class="btn btn-primary">Inscription</a>
-        </div>
-    </nav>
-</header>
-
+{% block content_wrapper %}
+{# Layout full-width pour la page home sans card wrapper #}
+<div class="container-xxl py-8">{# Ne pas fermer cette div ici, elle sera fermée à la fin #}
 <!-- Hero Section -->
-<section class="hero">
+<section class="hero-section text-center">
     <div class="container">
-        <h1 class="display-4 fw-bold mb-3">Bienvenue dans l’écosystème GDH</h1>
-        <p class="fs-5 mb-4 opacity-90">Premier groupe de cliniques et hôpitaux privés en France — 70 ans d’expertise au service de la santé</p>
-        <div class="d-flex flex-wrap justify-content-center gap-3 mt-3">
+        <h1 class="hero-title">Bienvenue dans l'écosystème GDH</h1>
+        <p class="hero-subtitle">Premier groupe de cliniques et hôpitaux privés en France — 70 ans d'expertise au service de la santé</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
             <a href="#" class="btn btn-light btn-lg px-5">
-                <i class="fas fa-user-graduate me-2"></i> Étudiant
+                <i class="ki-duotone ki-user fs-2"><span class="path1"></span><span class="path2"></span></i>
+                Étudiant
             </a>
-            <a href="#" class="btn btn-success btn-lg px-5 text-white">
-                <i class="fas fa-building me-2"></i> Entreprise
+            <a href="#" class="btn btn-success btn-lg px-5">
+                <i class="ki-duotone ki-office-bag fs-2"><span class="path1"></span><span class="path2"></span></i>
+                Entreprise
             </a>
             <a href="#" class="btn btn-info btn-lg px-5">
-                <i class="fas fa-user-md me-2"></i> Médecin
+                <i class="ki-duotone ki-heart-pulse fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                Médecin
             </a>
         </div>
     </div>
@@ -133,86 +36,106 @@
 
 <!-- Présentation du groupe GDH -->
 <section class="py-6">
-    <div class="container">
-        <h2 class="section-title text-center">Le groupe GDH</h2>
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <p class="lead">
-                    Créée en <strong>1954</strong> à Paris, la <strong>Générale des Hôpitaux (GDH)</strong> est le <strong>premier groupe privé de santé en France</strong>.
-                </p>
-                <p>
-                    Fort de <strong>70 ans d’expérience</strong>, GDH rassemble aujourd’hui <strong>9 hôpitaux</strong> répartis sur tout le territoire.
-                </p>
-                <p>
-                    L’un de ses établissements phares, l’<strong>Hôpital Sud Paris (HSP)</strong>, inauguré en <strong>1995</strong> à Marreuil-sur-Seine, dispose de :
-                </p>
-                <ul class="list-unstyled">
-                    <li class="d-flex align-items-start mb-2">
-                        <i class="fas fa-check text-success me-2 mt-1"></i>
-                        <span><strong>90 praticiens</strong></span>
-                    </li>
-                    <li class="d-flex align-items-start mb-2">
-                        <i class="fas fa-check text-success me-2 mt-1"></i>
-                        <span><strong>289 lits</strong></span>
-                    </li>
-                    <li class="d-flex align-items-start mb-2">
-                        <i class="fas fa-check text-success me-2 mt-1"></i>
-                        <span><strong>6 pôles médicaux</strong> : chirurgie, médecine, cancérologie, maternité, imagerie médicale, urgences 24h/24</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-lg-6">
-                <div class="ratio ratio-16x9 bg-light border rounded">
+    <h2 class="section-title text-center">Le groupe GDH</h2>
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <p class="fs-5 text-gray-800">
+                Créée en <strong>1954</strong> à Paris, la <strong>Générale des Hôpitaux (GDH)</strong> est le <strong>premier groupe privé de santé en France</strong>.
+            </p>
+            <p class="text-gray-700">
+                Fort de <strong>70 ans d'expérience</strong>, GDH rassemble aujourd'hui <strong>9 hôpitaux</strong> répartis sur tout le territoire.
+            </p>
+            <p class="text-gray-700">
+                L'un de ses établissements phares, l'<strong>Hôpital Sud Paris (HSP)</strong>, inauguré en <strong>1995</strong> à Marreuil-sur-Seine, dispose de :
+            </p>
+            <ul class="list-unstyled">
+                <li class="d-flex align-items-start mb-3">
+                    <i class="ki-duotone ki-check fs-2 text-success me-3">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    <span class="text-gray-700"><strong>90 praticiens</strong></span>
+                </li>
+                <li class="d-flex align-items-start mb-3">
+                    <i class="ki-duotone ki-check fs-2 text-success me-3">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    <span class="text-gray-700"><strong>289 lits</strong></span>
+                </li>
+                <li class="d-flex align-items-start mb-3">
+                    <i class="ki-duotone ki-check fs-2 text-success me-3">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    <span class="text-gray-700"><strong>6 pôles médicaux</strong> : chirurgie, médecine, cancérologie, maternité, imagerie médicale, urgences 24h/24</span>
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
                     <img src="{{ asset('assets/media/P_20180602_103845.jpg') }}"
                          alt="Hôpital Sud Paris – Façade"
-                         class="object-fit-cover w-100 h-100 rounded"
-                         onerror="this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center h-100 w-100 text-muted\'>Image non disponible</div>'">
+                         class="w-100 h-100 rounded"
+                         style="object-fit: cover; min-height: 350px;"
+                         onerror="this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center text-muted\' style=\'min-height: 350px;\'>Image non disponible</div>'">
                 </div>
-                <small class="text-muted d-block text-center mt-2">Hôpital Sud Paris (HSP) – Inauguré en 1995</small>
+                <div class="card-footer text-center bg-light">
+                    <small class="text-muted">Hôpital Sud Paris (HSP) – Inauguré en 1995</small>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Objectifs de la plateforme -->
-<section class="py-6 bg-light">
-    <div class="container">
-        <h2 class="section-title text-center">Objectif de cette plateforme</h2>
-        <p class="text-center mb-5">Renforcer les liens entre trois acteurs clés de l’écosystème santé :</p>
+<section class="py-6">
+    <h2 class="section-title text-center">Objectif de cette plateforme</h2>
+    <p class="text-center text-gray-700 mb-5">Renforcer les liens entre trois acteurs clés de l'écosystème santé :</p>
 
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="text-center p-4">
-                    <div class="card-icon bg-light text-success" style="background-color:#dcfce7;">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <h5 class="fw-bold">Médecins du groupe</h5>
-                    <p class="text-muted">
-                        Maintenir le contact, organiser des événements, participer à l’encadrement des futurs professionnels.
-                    </p>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="icon-card">
+                <div class="card-icon bg-success">
+                    <i class="ki-duotone ki-heart-pulse fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
                 </div>
+                <h5 class="fw-bold text-gray-900">Médecins du groupe</h5>
+                <p class="text-gray-600">
+                    Maintenir le contact, organiser des événements, participer à l'encadrement des futurs professionnels.
+                </p>
             </div>
-            <div class="col-md-4">
-                <div class="text-center p-4">
-                    <div class="card-icon bg-light text-primary" style="background-color:#dbeafe;">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                    <h5 class="fw-bold">Étudiants en médecine</h5>
-                    <p class="text-muted">
-                        Accès à des stages, alternances, emplois, événements et mentorat dès la formation.
-                    </p>
+        </div>
+        <div class="col-md-4">
+            <div class="icon-card">
+                <div class="card-icon bg-primary">
+                    <i class="ki-duotone ki-user fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
                 </div>
+                <h5 class="fw-bold text-gray-900">Étudiants en médecine</h5>
+                <p class="text-gray-600">
+                    Accès à des stages, alternances, emplois, événements et mentorat dès la formation.
+                </p>
             </div>
-            <div class="col-md-4">
-                <div class="text-center p-4">
-                    <div class="card-icon bg-light text-info" style="background-color:#dcf3f3;">
-                        <i class="fas fa-building"></i>
-                    </div>
-                    <h5 class="fw-bold">Entreprises partenaires</h5>
-                    <p class="text-muted">
-                        Recruter des talents, co-organiser des événements, valoriser leurs innovations.
-                    </p>
+        </div>
+        <div class="col-md-4">
+            <div class="icon-card">
+                <div class="card-icon bg-info">
+                    <i class="ki-duotone ki-office-bag fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
                 </div>
+                <h5 class="fw-bold text-gray-900">Entreprises partenaires</h5>
+                <p class="text-gray-600">
+                    Recruter des talents, co-organiser des événements, valoriser leurs innovations.
+                </p>
             </div>
         </div>
     </div>
@@ -220,147 +143,256 @@
 
 <!-- Réseau national (9 hôpitaux) -->
 <section class="py-6">
-    <div class="container">
-        <h2 class="section-title text-center">Notre réseau national</h2>
-        <p class="text-center mb-5">GDH compte <strong>9 hôpitaux</strong> stratégiquement situés en France métropolitaine :</p>
+    <h2 class="section-title text-center">Notre réseau national</h2>
+    <p class="text-center text-gray-700 mb-5">GDH compte <strong>9 hôpitaux</strong> stratégiquement situés en France métropolitaine :</p>
 
+    <!-- Card contenant la carte et les boutons -->
+    <div class="card hospital-map-card shadow-sm">
+        <!-- Carte interactive -->
+        <div id="map"></div>
 
+        <!-- Séparateur -->
+        <div class="map-section-header">
+            <h6 class="fw-semibold">
+                <i class="ki-duotone ki-geolocation fs-2 me-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                Sélectionnez un établissement
+            </h6>
+        </div>
+
+        <!-- Boutons de navigation organisés en grille -->
+        <div class="card-body p-4">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="0">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        HSP - Hôpital Sud Paris
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="1">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        HNP - Hôpital Nord Paris
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="2">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        Clinique Océane
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="3">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        Centre Hospitalier Lyon
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="4">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        Clinique Méditerranée
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="5">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        Hôpital des Alpes
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="6">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        Centre de Santé Bretagne
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="7">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        Hôpital du Grand Est
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary btn-hospital w-100 text-start" data-hospital="8">
+                        <i class="ki-duotone ki-hospital fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                        Clinique Aquitaine
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
-
-{#<!-- Actualités & Événements (section dynamique) -->#}
-{#<section class="py-6 bg-light">#}
-{#    <div class="container">#}
-{#        <div class="d-flex justify-content-between align-items-center mb-5">#}
-{#            <h2 class="section-title mb-0">Actualités & Événements</h2>#}
-{#            <a href="#" class="text-muted">Voir tout →</a>#}
-{#        </div>#}
-
-{#        <div class="row g-5">#}
-{#            <!-- Actualités -->#}
-{#            <div class="col-lg-6">#}
-{#                <h5 class="fw-bold text-success mb-3"><i class="fas fa-bullhorn me-2"></i> Dernières actualités</h5>#}
-{#                {% if actualites is not empty %}#}
-{#                    {% for actualite in actualites|slice(0, 3) %}#}
-{#                        <div class="news-item">#}
-{#                            <h6 class="mb-1">#}
-{#                                {% if actualite.titre|length > 70 %}#}
-{#                                    {{ actualite.titre|slice(0, 67) }}…#}
-{#                                {% else %}#}
-{#                                    {{ actualite.titre }}#}
-{#                                {% endif %}#}
-{#                            </h6>#}
-{#                            <small class="text-muted">#}
-{#                                Publié le {{ actualite.datePublication|date('d/m/Y') }}#}
-{#                            </small>#}
-{#                            <p class="mt-1 text-muted">#}
-{#                                {% set contenu = actualite.contenu|striptags %}#}
-{#                                {% if contenu|length > 120 %}#}
-{#                                    {{ contenu|slice(0, 117) }}…#}
-{#                                {% else %}#}
-{#                                    {{ contenu }}#}
-{#                                {% endif %}#}
-{#                            </p>#}
-{#                        </div>#}
-{#                    {% endfor %}#}
-{#                {% else %}#}
-{#                    <p class="text-muted fst-italic">Aucune actualité pour le moment.</p>#}
-{#                {% endif %}#}
-{#            </div>#}
-
-{#            <!-- Événements -->#}
-{#            <div class="col-lg-6">#}
-{#                <h5 class="fw-bold text-info mb-3"><i class="fas fa-calendar-day me-2"></i> Prochains événements</h5>#}
-{#                {% if evenements is not empty %}#}
-{#                    {% for evenement in evenements|slice(0, 3) %}#}
-{#                        <div class="event-item">#}
-{#                            <h6 class="mb-1">#}
-{#                                {% if evenement.titre|length > 60 %}#}
-{#                                    {{ evenement.titre|slice(0, 57) }}…#}
-{#                                {% else %}#}
-{#                                    {{ evenement.titre }}#}
-{#                                {% endif %}#}
-{#                            </h6>#}
-{#                            <small class="text-muted d-block">#}
-{#                                <i class="fas fa-map-marker-alt me-1"></i>#}
-{#                                {% if evenement.lieu|length > 40 %}#}
-{#                                    {{ evenement.lieu|slice(0, 37) }}…#}
-{#                                {% else %}#}
-{#                                    {{ evenement.lieu }}#}
-{#                                {% endif %}#}
-{#                            </small>#}
-{#                            <small class="text-success d-block">#}
-{#                                <i class="far fa-calendar me-1"></i>#}
-{#                                Du {{ evenement.dateDebut|date('d/m') }} au {{ evenement.dateFin|date('d/m/Y') }}#}
-{#                            </small>#}
-{#                            <p class="mt-1 text-muted">#}
-{#                                {% set desc = evenement.description|striptags %}#}
-{#                                {% if desc|length > 100 %}#}
-{#                                    {{ desc|slice(0, 97) }}…#}
-{#                                {% else %}#}
-{#                                    {{ desc }}#}
-{#                                {% endif %}#}
-{#                            </p>#}
-{#                        </div>#}
-{#                    {% endfor %}#}
-{#                {% else %}#}
-{#                    <p class="text-muted fst-italic">Aucun événement à venir.</p>#}
-{#                {% endif %}#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{#</section>#}
 
 <!-- CTA finale -->
-<section class="py-6 text-center text-white" style="background: linear-gradient(135deg, skyblue, skyblue);">
+<section class="cta-section">
     <div class="container">
-        <br>
-        <h2 class="fw-bold mb-3">Rejoignez la communauté GDH</h2>
-        <p class="fs-5 opacity-90 mb-4">
-            Ensemble, construisons une santé connectée, innovante et humaine.
-        </p>
-        <br>
+        <h2>Rejoignez la communauté GDH</h2>
+        <p>Ensemble, construisons une santé connectée, innovante et humaine.</p>
     </div>
 </section>
 
-<!-- Footer -->
-<footer>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5 class="fw-bold">Générale des Hôpitaux</h5>
-                <p class="small">
-                    Premier groupe de cliniques et hôpitaux privés en France.<br>
-                    Siège social : Paris<br>
-                    © {{ 'now'|date('Y') }} – Tous droits réservés
-                </p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="fw-bold">Liens utiles</h5>
-                <ul class="list-unstyled small">
-                    <li><a href="#" class="text-light text-decoration-none">Mentions légales</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Politique de confidentialité</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">CGU</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Contact & Support</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="fw-bold">Contact</h5>
-                <address class="small text-light">
-                    📧 contact@gdh.fr<br>
-                    📞 +33 1 XX XX XX XX<br>
-                    🔒 Site sécurisé (SSL/TLS)
-                </address>
-            </div>
-        </div>
-        <hr class="border-secondary">
-        <div class="text-center small text-light">
-            Conforme RGPD – Plateforme développée pour le groupe GDH
-        </div>
-    </div>
-</footer>
+</div>{# Fermeture du container-xxl #}
+{% endblock %}
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block javascripts %}
+<!-- Leaflet JS pour la carte -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Données des 9 hôpitaux du groupe GDH
+    const hospitals = [
+        {
+            name: "HSP - Hôpital Sud Paris",
+            address: "1 Avenue de la Santé, 77000 Marreuil-sur-Seine",
+            phone: "01 64 71 50 00",
+            lat: 48.534,
+            lng: 2.950,
+            specialties: "Chirurgie • Médecine • Maternité • Urgences 24/7"
+        },
+        {
+            name: "HNP - Hôpital Nord Paris",
+            address: "85 Boulevard Victor Hugo, 93400 Saint-Ouen",
+            phone: "01 49 18 20 00",
+            lat: 48.912,
+            lng: 2.333,
+            specialties: "Cancérologie • Cardiologie • Neurologie"
+        },
+        {
+            name: "Clinique Océane",
+            address: "42 Rue de la Mer, 35400 Saint-Malo",
+            phone: "02 99 81 60 00",
+            lat: 48.649,
+            lng: -2.005,
+            specialties: "Chirurgie ambulatoire • Imagerie • Rééducation"
+        },
+        {
+            name: "Centre Hospitalier Lyon Est",
+            address: "156 Avenue Lacassagne, 69003 Lyon",
+            phone: "04 72 11 77 11",
+            lat: 45.753,
+            lng: 4.878,
+            specialties: "Orthopédie • Rhumatologie • Médecine sportive"
+        },
+        {
+            name: "Clinique Méditerranée",
+            address: "8 Corniche Kennedy, 13007 Marseille",
+            phone: "04 91 59 12 00",
+            lat: 43.282,
+            lng: 5.358,
+            specialties: "Chirurgie esthétique • Dermatologie • Ophtalmologie"
+        },
+        {
+            name: "Hôpital des Alpes",
+            address: "22 Avenue Jean Jaurès, 38000 Grenoble",
+            phone: "04 76 46 50 50",
+            lat: 45.188,
+            lng: 5.715,
+            specialties: "Traumatologie • Médecine de montagne • Urgences"
+        },
+        {
+            name: "Centre de Santé Bretagne",
+            address: "15 Rue de Rennes, 29200 Brest",
+            phone: "02 98 34 70 00",
+            lat: 48.390,
+            lng: -4.486,
+            specialties: "Médecine générale • Pédiatrie • Gériatrie"
+        },
+        {
+            name: "Hôpital du Grand Est",
+            address: "30 Boulevard de l'Europe, 67000 Strasbourg",
+            phone: "03 88 35 50 00",
+            lat: 48.583,
+            lng: 7.745,
+            specialties: "Cardiologie • Pneumologie • Néphrologie"
+        },
+        {
+            name: "Clinique Aquitaine",
+            address: "77 Cours de l'Intendance, 33000 Bordeaux",
+            phone: "05 56 90 80 00",
+            lat: 44.841,
+            lng: -0.574,
+            specialties: "Oncologie • Radiothérapie • Soins palliatifs"
+        }
+    ];
+
+    // Initialisation de la carte centrée sur la France
+    const map = L.map('map', {
+        center: [46.603354, 1.888334],
+        zoom: 6,
+        scrollWheelZoom: false,
+        zoomControl: true
+    });
+
+    // Ajout de la couche de tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+        minZoom: 5
+    }).addTo(map);
+
+    // Forcer le recalcul de la taille après un court délai
+    setTimeout(function() {
+        map.invalidateSize();
+    }, 100);
+
+    // Icône personnalisée pour les hôpitaux (SVG simple)
+    const hospitalIcon = L.divIcon({
+        html: '<div style="width: 36px; height: 36px; background: #1B84FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(27, 132, 255, 0.4); border: 3px solid white;"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg></div>',
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -36],
+        className: 'hospital-marker'
+    });
+
+    // Tableau pour stocker les marqueurs
+    const markers = [];
+
+    // Ajout des marqueurs pour chaque hôpital
+    hospitals.forEach((hospital, index) => {
+        const marker = L.marker([hospital.lat, hospital.lng], { icon: hospitalIcon })
+            .bindPopup(`
+                <div style="min-width: 250px; padding: 0.5rem;">
+                    <h6 style="color: #1B84FF; font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">${hospital.name}</h6>
+                    <p style="margin-bottom: 0.5rem; font-size: 0.875rem; color: #3F4254;">
+                        <strong>📍</strong> ${hospital.address}
+                    </p>
+                    <p style="margin-bottom: 0.5rem; font-size: 0.875rem; color: #3F4254;">
+                        <strong>📞</strong> ${hospital.phone}
+                    </p>
+                    <p style="margin-bottom: 0; font-size: 0.875rem; color: #7E8299;">
+                        <strong>🏥</strong> ${hospital.specialties}
+                    </p>
+                </div>
+            `)
+            .addTo(map);
+        markers.push(marker);
+    });
+
+    // Gestion des boutons de navigation
+    document.querySelectorAll('.btn-hospital').forEach((button, index) => {
+        button.addEventListener('click', function() {
+            const hospitalIndex = parseInt(this.getAttribute('data-hospital'));
+            const hospital = hospitals[hospitalIndex];
+
+            // Centrer la carte sur l'hôpital sélectionné
+            map.setView([hospital.lat, hospital.lng], 13);
+
+            // Ouvrir le popup du marqueur
+            markers[hospitalIndex].openPopup();
+
+            // Animation du bouton
+            document.querySelectorAll('.btn-hospital').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-primary');
+            });
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+            this.classList.add('active');
+        });
+    });
+}); // Fin du DOMContentLoaded
+</script>
+{% endblock %}

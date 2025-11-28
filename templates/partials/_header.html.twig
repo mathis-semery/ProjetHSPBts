@@ -155,9 +155,13 @@
 
                     <!--begin::User-->
                     <div class="d-flex align-items-center ms-2 ms-lg-3" id="kt_header_user_menu_toggle">
-                        <div class="cursor-pointer symbol symbol-35px symbol-md-40px"
+                        <div class="btn btn-custom btn-active-light cursor-pointer"
                              data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-                            <img alt="Pic" src="{{ asset('assets/media/avatars/300-1.jpg') }}">
+                            <i class="ki-duotone ki-user fs-2 me-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <span class="fw-semibold">Mon compte</span>
                         </div>
 
                         <!--begin::User account menu-->
@@ -165,8 +169,10 @@
                             {% if app.user %}
                                 <div class="menu-item px-3">
                                     <div class="menu-content d-flex align-items-center px-3">
-                                        <div class="symbol symbol-50px me-5">
-                                            <img alt="Logo" src="{{ asset('assets/media/avatars/300-1.jpg') }}">
+                                        <div class="symbol symbol-50px symbol-circle me-5 bg-light-primary">
+                                            <span class="symbol-label fs-2 fw-bold text-primary">
+                                                {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+                                            </span>
                                         </div>
                                         <div class="d-flex flex-column">
                                             <div class="fw-bold d-flex align-items-center fs-5">

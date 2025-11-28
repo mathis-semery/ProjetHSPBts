@@ -1,0 +1,275 @@
+/* ============================================
+   Styles pour la page d'accueil GDH
+   Utilise les classes Keenthemes natives
+   ============================================ */
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1B84FF 0%, #0F5FD6 100%);
+    padding: 80px 0;
+    margin-bottom: 3rem;
+    border-radius: 0.625rem;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+}
+
+/* Section Titles */
+.section-title {
+    position: relative;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    color: #1E2129;
+    padding-bottom: 1rem;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: #1B84FF;
+    border-radius: 2px;
+}
+
+/* Icon Cards - Section Objectifs */
+.icon-card {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    background: white;
+    border-radius: 0.625rem;
+    transition: all 0.3s ease;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-shadow: 0 0 20px 0 rgba(76, 87, 125, 0.02);
+}
+
+.icon-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 40px rgba(27, 132, 255, 0.15);
+}
+
+.icon-card .card-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    flex-shrink: 0;
+}
+
+.icon-card .card-icon.bg-primary {
+    background-color: rgba(27, 132, 255, 0.1) !important;
+}
+
+.icon-card .card-icon.bg-primary i {
+    color: #1B84FF;
+}
+
+.icon-card .card-icon.bg-success {
+    background-color: rgba(23, 198, 83, 0.1) !important;
+}
+
+.icon-card .card-icon.bg-success i {
+    color: #17C653;
+}
+
+.icon-card .card-icon.bg-info {
+    background-color: rgba(114, 57, 234, 0.1) !important;
+}
+
+.icon-card .card-icon.bg-info i {
+    color: #7239EA;
+}
+
+.icon-card h5 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.icon-card p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Hospital Map Section */
+.hospital-map-card {
+    border: none;
+    border-radius: 0.625rem;
+    overflow: hidden;
+    background: white;
+}
+
+/* Map Container - IMPORTANT: Hauteur fixe pour Leaflet */
+#map {
+    height: 350px;
+    width: 100%;
+    border-radius: 0.625rem 0.625rem 0 0;
+    background: #f5f8fa;
+    z-index: 1;
+}
+
+/* Map Section Header */
+.map-section-header {
+    background: linear-gradient(to right, rgba(27, 132, 255, 0.08), rgba(27, 132, 255, 0.04));
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #E4E6EF;
+    border-bottom: 1px solid #E4E6EF;
+}
+
+.map-section-header h6 {
+    color: #0F5FD6;
+    margin-bottom: 0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.map-section-header i {
+    color: #1B84FF;
+}
+
+/* Hospital Buttons */
+.btn-hospital {
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #E4E6EF;
+    color: #3F4254;
+    background: white;
+    display: flex;
+    align-items: center;
+}
+
+.btn-hospital:hover {
+    background-color: rgba(27, 132, 255, 0.08);
+    border-color: #1B84FF;
+    color: #1B84FF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(27, 132, 255, 0.15);
+}
+
+.btn-hospital i {
+    flex-shrink: 0;
+}
+
+.btn-hospital.active,
+.btn-hospital.btn-primary {
+    background-color: #1B84FF !important;
+    border-color: #1B84FF !important;
+    color: white !important;
+}
+
+.btn-hospital.active:hover,
+.btn-hospital.btn-primary:hover {
+    background-color: #0F5FD6 !important;
+    border-color: #0F5FD6 !important;
+}
+
+/* Leaflet Map Customization */
+.hospital-marker {
+    background: transparent !important;
+    border: none !important;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 0.625rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 0;
+}
+
+.leaflet-popup-content {
+    margin: 1rem;
+}
+
+.leaflet-popup-tip {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, #1B84FF 0%, #0F5FD6 100%);
+    padding: 80px 0;
+    margin-top: 3rem;
+    border-radius: 0.625rem;
+    text-align: center;
+    color: white;
+}
+
+.cta-section h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.cta-section p {
+    font-size: 1.125rem;
+    opacity: 0.95;
+    margin-bottom: 0;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 991px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.125rem;
+    }
+
+    .hero-section {
+        padding: 60px 0;
+    }
+
+    .icon-card {
+        min-height: auto;
+        padding: 2rem 1.5rem;
+    }
+
+    #map {
+        height: 300px;
+    }
+
+    .cta-section {
+        padding: 60px 0;
+    }
+
+    .cta-section h2 {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    #map {
+        height: 250px;
+    }
+}

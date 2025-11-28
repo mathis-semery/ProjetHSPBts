@@ -27,19 +27,20 @@ security:
             user_checker: App\Security\UserChecker
 
     access_control:
-        # Public
-        - { path: ^/login$, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/verify-email, roles: PUBLIC_ACCESS }
-        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
-        - { path: ^/verify, roles: PUBLIC_ACCESS }
+        # Pages publiques (accessibles sans connexion)
+        - { path: ^/$, roles: PUBLIC_ACCESS }                      # Page d'accueil
+        - { path: ^/login$, roles: PUBLIC_ACCESS }                 # Page de connexion
+        - { path: ^/register, roles: PUBLIC_ACCESS }               # Inscription
+        - { path: ^/verify/, roles: PUBLIC_ACCESS }                # Vérification d'email
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }         # Réinitialisation du mot de passe
 
-        # Admin
+        # Pages admin (réservées aux administrateurs)
         - { path: ^/admin, roles: ROLE_ADMIN }
 
-        # Pages autorisées aux comptes "en attente de vérification"
+        # Pages accessibles aux utilisateurs en attente de vérification
         - { path: ^/verification$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/attente-verification$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/attente$, roles: IS_AUTHENTICATED_FULLY }
 
-        # Tout le reste protégé
+        # Tout le reste protégé (nécessite d'être connecté)
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

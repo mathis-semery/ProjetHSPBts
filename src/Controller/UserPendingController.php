@@ -34,7 +34,19 @@ class UserPendingController extends AbstractController
 
     ): Response {
         $user->setEtatValidation(true);
-        $user->setRoles(['ROLE_USER']);
+
+        // Récupérer les rôles actuels et retirer ROLE_ATTENTE_VERIFICATION
+        $currentRoles = $user->getRolesForForm();
+        $newRoles = array_filter($currentRoles, function($role) {
+            return $role !== 'ROLE_ATTENTE_VERIFICATION';
+        });
+
+        // S'assurer qu'il y a au moins un rôle métier
+        if (empty($newRoles)) {
+            $newRoles = ['ROLE_USER'];
+        }
+
+        $user->setRoles(array_values($newRoles));
         $entityManager->flush();
 
         $email = (new Email())

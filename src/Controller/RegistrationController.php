@@ -24,13 +24,20 @@ class RegistrationController extends AbstractController
             $user->setNom($request->request->get('nom'));
             $user->setPrenom($request->request->get('prenom'));
             $user->setEmail($request->request->get('email'));
-            $user->setMetier($request->request->get('metier'));
+            $user->setMetier($request->request->get('metier') ?? '');
             $user->setFormation($request->request->get('formation'));
             $user->setSpecialite($request->request->get('specialite'));
             $user->setPosteOccupe($request->request->get('poste_occupe'));
             $user->setCv($request->request->get('cv'));
             $user->setDateCreation(new \DateTime());
-            $user->setRoles(['ROLE_ATTENTE_VERIFICATION']);
+
+            // Récupérer le rôle métier sélectionné et l'ajouter avec ROLE_ATTENTE_VERIFICATION
+            $metierRole = $request->request->get('metierRole');
+            $roles = ['ROLE_ATTENTE_VERIFICATION'];
+            if ($metierRole && in_array($metierRole, ['ROLE_ELEVE', 'ROLE_MEDECIN', 'ROLE_PARTENAIRE'])) {
+                $roles[] = $metierRole;
+            }
+            $user->setRoles($roles);
 
             $hashedPassword = $passwordHasher->hashPassword($user, $request->request->get('password'));
             $user->setPassword($hashedPassword);

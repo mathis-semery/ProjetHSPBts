@@ -25,13 +25,14 @@ class CanalType extends AbstractType
                 'choices'  => [
                     'Médecin' => 'MEDECIN',
                     'Partenaire' => 'PARTENAIRE',
-                    'Etudiant' => 'ETUDIANT',
+                    'Élève/Étudiant' => 'ELEVE',
                 ],
                 'multiple' => true,  // permet de sélectionner plusieurs rôles
                 'expanded' => true, // true = checkboxes, false = select multiple
                 'required' => false,
-                'label' => 'Liste automatique (Rôles)',
+                'label' => 'Liste automatique (Rôles métiers autorisés)',
                 'attr' => ['class' => 'form-select'],
+                'help' => 'Sélectionnez les métiers autorisés à accéder à ce canal',
             ]);
     }
 

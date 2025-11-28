@@ -26,8 +26,17 @@ class CanalController extends AbstractController
             if (in_array('ROLE_ADMIN', $user->getRoles())) {
                 return true; // Admin voit tout
             }
-            $metiers = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
-            return in_array($user->getMetier(), $metiers) || $canal->getRefUser() === $user;
+            // Transformation des métiers en rôles pour la vérification
+            $metiersAutorise = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
+            $rolesAutorise = array_map(function($metier) {
+                return 'ROLE_' . strtoupper($metier);
+            }, $metiersAutorise);
+
+            // Vérifier si l'utilisateur a au moins un des rôles autorisés
+            $userRoles = $user->getRoles();
+            $hasAccess = !empty(array_intersect($userRoles, $rolesAutorise));
+
+            return $hasAccess || $canal->getRefUser() === $user;
         });
 
         return $this->render('canal/index.html.twig', [
@@ -64,8 +73,17 @@ class CanalController extends AbstractController
         $user = $this->getUser();
 
         if (!in_array('ROLE_ADMIN', $user->getRoles())) {
-            $metiers = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
-            if (!in_array($user->getMetier(), $metiers) && $canal->getRefUser() !== $user) {
+            // Transformation des métiers en rôles pour la vérification
+            $metiersAutorise = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
+            $rolesAutorise = array_map(function($metier) {
+                return 'ROLE_' . strtoupper($metier);
+            }, $metiersAutorise);
+
+            // Vérifier si l'utilisateur a au moins un des rôles autorisés
+            $userRoles = $user->getRoles();
+            $hasAccess = !empty(array_intersect($userRoles, $rolesAutorise));
+
+            if (!$hasAccess && $canal->getRefUser() !== $user) {
                 throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à ce canal.');
             }
         }

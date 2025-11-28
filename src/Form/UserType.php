@@ -70,8 +70,10 @@ class UserType extends AbstractType
                 ->add('rolesForForm', ChoiceType::class, [
                     'label' => 'Rôles',
                     'choices' => [
-                        'Utilisateur' => 'ROLE_USER',
                         'Administrateur' => 'ROLE_ADMIN',
+                        'Élève/Étudiant' => 'ROLE_ELEVE',
+                        'Médecin' => 'ROLE_MEDECIN',
+                        'Partenaire' => 'ROLE_PARTENAIRE',
                     ],
                     'multiple' => true,
                     'expanded' => true,
@@ -102,15 +104,12 @@ class UserType extends AbstractType
                             'placeholder' => '********',
                         ],
                     ])
-                    ->add('metier',ChoiceType::class, [
-                        'label' => 'metier',
-                        'choices' => [
-                            'Eleve/Etudiant' => 'ELEVE',
-                            'Medecin' => 'MEDECIN',
-                            'Partenaire' => 'PARTENAIRE',
-                        ],'multiple' => true,
-                        'expanded' => true,
-                        'mapped' => false,
+                    ->add('metier', \Symfony\Component\Form\Extension\Core\Type\TextType::class, [
+                        'label' => 'Métier (à titre indicatif)',
+                        'required' => false,
+                        'attr' => [
+                            'placeholder' => 'Ex: Élève, Médecin, Partenaire...',
+                        ],
                     ])
                     ->add('formation')
                     ->add('specialite')

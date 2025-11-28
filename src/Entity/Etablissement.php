@@ -23,8 +23,6 @@ class Etablissement
 
     #[ORM\Column(length: 255 , unique: true)]
     private ?string $siteWeb = null;
-    #[ORM\OneToOne(mappedBy: 'refEtablissement', cascade: ['persist', 'remove'])]
-    private ?User $refUser = null;
 
     /**
      * @var Collection<int, User>
@@ -104,26 +102,6 @@ class Etablissement
                 $user->setRefEtablissement(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getRefUser(): ?User
-    {
-        return $this->refUser;
-    }
-
-    public function setRefUser(?User $refUser): static
-    {
-        if ($refUser === null && $this->refUser !== null) {
-            $this->refUser->setRefEtablissement(null);
-        }
-
-        if ($refUser !== null && $refUser->getRefEtablissement() !== $this) {
-            $refUser->setRefEtablissement($this);
-        }
-
-        $this->refUser = $refUser;
 
         return $this;
     }

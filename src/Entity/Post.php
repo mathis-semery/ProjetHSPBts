@@ -21,7 +21,7 @@ class Post
     #[ORM\Column(type: 'text')]
     private ?string $texte = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $refUser = null;
 
@@ -35,7 +35,6 @@ class Post
     public function __construct()
     {
         $this->reponses = new ArrayCollection();
-        $this->dateHeure = new \DateTime();
     }
 
     public function getId(): ?int { return $this->id; }

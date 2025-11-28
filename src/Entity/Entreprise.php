@@ -23,13 +23,11 @@ class Entreprise
 
     #[ORM\Column(length: 255 , unique: true)]
     private ?string $siteWeb = null;
-    #[ORM\OneToOne(mappedBy: 'refEntreprise', cascade: ['persist', 'remove'])]
-    private ?User $refUser = null;
 
     /**
      * @var Collection<int, User>
      */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'refEntreptrise')]
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'refEntreprise')]
     private Collection $users;
 
     public function __construct()
@@ -90,7 +88,7 @@ class Entreprise
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->setRefEntreptrise($this);
+            $user->setrefEntreprise($this);
         }
 
         return $this;
@@ -100,30 +98,10 @@ class Entreprise
     {
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
-            if ($user->getRefEntreptrise() === $this) {
-                $user->setRefEntreptrise(null);
+            if ($user->getrefEntreprise() === $this) {
+                $user->setrefEntreprise(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getRefUser(): ?User
-    {
-        return $this->refUser;
-    }
-
-    public function setRefUser(?User $refUser): static
-    {
-        if ($refUser === null && $this->refUser !== null) {
-            $this->refUser->setrefEntreprise(null);
-        }
-
-        if ($refUser !== null && $refUser->getrefEntreprise() !== $this) {
-            $refUser->setrefEntreprise($this);
-        }
-
-        $this->refUser = $refUser;
 
         return $this;
     }

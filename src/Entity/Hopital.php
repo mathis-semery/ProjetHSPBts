@@ -21,9 +21,6 @@ class Hopital
     #[ORM\Column(length: 150)]
     private ?string $commune = null;
 
-    #[ORM\OneToOne(mappedBy: 'refHopital', cascade: ['persist', 'remove'])]
-    private ?User $refUser = null;
-
     /**
      * @var Collection<int, User>
      */
@@ -60,26 +57,6 @@ class Hopital
     public function setCommune(string $commune): static
     {
         $this->commune = $commune;
-
-        return $this;
-    }
-
-    public function getRefUser(): ?User
-    {
-        return $this->refUser;
-    }
-
-    public function setRefUser(?User $refUser): static
-    {
-        if ($refUser === null && $this->refUser !== null) {
-            $this->refUser->setRefHopital(null);
-        }
-
-        if ($refUser !== null && $refUser->getRefHopital() !== $this) {
-            $refUser->setRefHopital($this);
-        }
-
-        $this->refUser = $refUser;
 
         return $this;
     }

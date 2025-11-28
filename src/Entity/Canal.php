@@ -24,7 +24,7 @@ class Canal
     #[ORM\Column(type: 'json', nullable: true)]
     private array $ListeAuto = [];
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'canals')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $refUser = null;
 

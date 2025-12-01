@@ -16,6 +16,9 @@ class Offre
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $titre = null;
+
     #[ORM\Column(length: 500)]
     private ?string $description = null;
 
@@ -25,8 +28,12 @@ class Offre
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
     private ?string $salaire = null;
+
+    #[ORM\ManyToOne(inversedBy: 'offres')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $auteur = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $etat = null;
@@ -45,6 +52,18 @@ class Offre
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(string $titre): static
+    {
+        $this->titre = $titre;
+
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -133,6 +152,18 @@ class Offre
                 $candidature->setRefOffre(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAuteur(): ?User
+    {
+        return $this->auteur;
+    }
+
+    public function setAuteur(?User $auteur): static
+    {
+        $this->auteur = $auteur;
 
         return $this;
     }

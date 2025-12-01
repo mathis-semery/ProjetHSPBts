@@ -119,6 +119,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Entreprise $refEntreprise = null;
 
+    /**
+     * @var Collection<int, Offre>
+     */
+    #[ORM\OneToMany(targetEntity: Offre::class, mappedBy: 'auteur')]
+    private Collection $offres;
+
     public function __construct()
     {
         $this->reponses = new ArrayCollection();
@@ -126,6 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->posts = new ArrayCollection();
         $this->inscriptions = new ArrayCollection();
         $this->candidatures = new ArrayCollection();
+        $this->offres = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -495,6 +502,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setrefEntreprise(?Entreprise $refEntreprise): static
     {
         $this->refEntreprise = $refEntreprise;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Offre>
+     */
+    public function getOffres(): Collection
+    {
+        return $this->offres;
+    }
+
+    public function addOffre(Offre $offre): static
+    {
+        if (!$this->offres->contains($offre)) {
+            $this->offres->add($offre);
+            $offre->setAuteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffre(Offre $offre): static
+    {
+        if ($this->offres->removeElement($offre)) {
+            if ($offre->getAuteur() === $this) {
+                $offre->setAuteur(null);
+            }
+        }
 
         return $this;
     }

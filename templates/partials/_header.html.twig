@@ -177,8 +177,8 @@
                                         <div class="d-flex flex-column">
                                             <div class="fw-bold d-flex align-items-center fs-5">
                                                 {{ app.user.nom }} {{ app.user.prenom }}
-                                                {% if 'ROLE_PRO' in app.user.roles %}
-                                                    <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Pro</span>
+                                                {% if 'ROLE_PARTENAIRE' in app.user.roles %}
+                                                    <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Partenaire</span>
                                                 {% endif %}
                                             </div>
                                             <a href="{{ path('app_profile') }}" class="fw-semibold text-muted text-hover-primary fs-7">{{ app.user.email }}</a>
@@ -189,21 +189,29 @@
                                 <div class="separator my-2"></div>
 
                                 <div class="menu-item px-3">
-                                    <a href="{{ path('app_logout') }}" class="menu-link d-flex px-5"
-                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        Déconnexion
-                                    </a>
                                     <a href="{{ path('app_profile', { id: app.user.id }) }}"
-                                       class="menu-link d-flex px-5"
-                                       onclick="event.preventDefault(); document.getElementById('profile-form').submit();">
+                                       class="menu-link d-flex px-5">
+                                        <i class="ki-duotone ki-profile-user fs-2 me-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                        </i>
                                         Mon profil
                                     </a>
+                                </div>
 
-                                    <form id="profile-form"
-                                          action="{{ path('app_profile', { id: app.user.id }) }}"
-                                          method="GET"
-                                          style="display: none;"></form>
+                                <div class="separator my-2"></div>
 
+                                <div class="menu-item px-3">
+                                    <a href="{{ path('app_logout') }}" class="menu-link d-flex px-5"
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <i class="ki-duotone ki-exit-right fs-2 me-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        Déconnexion
+                                    </a>
 
                                     <form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="d-none">
                                         {{ csrf_token('logout')|raw }}

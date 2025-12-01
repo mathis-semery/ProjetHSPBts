@@ -6,21 +6,125 @@
     <div class="container py-10">
 
         <!-- Header -->
-        <div class="card mb-10">
+        <div class="card mb-6">
             <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div>
-                    <h1 class="fs-2hx fw-bold text-dark mb-2">Offres d'emploi</h1>
-                    <p class="text-gray-600 mb-0">Consultez les opportunités de carrière dans le groupe GDH.</p>
+                    <h1 class="fs-2hx fw-bold text-dark mb-2">
+                        {% if mes_offres == '1' %}
+                            Offres de mon entreprise
+                        {% else %}
+                            Offres d'emploi
+                        {% endif %}
+                    </h1>
+                    <p class="text-gray-600 mb-0">
+                        {% if mes_offres == '1' %}
+                            Gérez les offres de votre entreprise
+                        {% else %}
+                            Consultez les opportunités de carrière dans le groupe GDH.
+                        {% endif %}
+                    </p>
                 </div>
 
-                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PRO') %}
-                    <a href="{{ path('app_offre_new') }}" class="btn btn-primary mt-4 mt-md-0">
-                        <i class="ki-duotone ki-plus fs-2"></i>
-                        Créer une offre
-                    </a>
-                {% endif %}
+                <div class="d-flex gap-2 mt-4 mt-md-0">
+                    {% if (is_granted('ROLE_ADMIN') or is_granted('ROLE_PARTENAIRE')) and app.user.refEntreprise %}
+                        {% if mes_offres == '1' %}
+                            <a href="{{ path('app_offre_index') }}" class="btn btn-light-secondary">
+                                <i class="ki-duotone ki-arrow-left fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Toutes les offres
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_offre_index', {'mes_offres': '1'}) }}" class="btn btn-light-primary">
+                                <i class="ki-duotone ki-briefcase fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Mes offres
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PARTENAIRE') %}
+                        <a href="{{ path('app_offre_new') }}" class="btn btn-primary">
+                            <i class="ki-duotone ki-plus fs-2"></i>
+                            Créer une offre
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
+
+        <!-- Barre de recherche et filtres -->
+        <div class="card mb-6">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_offre_index') }}" class="row g-4">
+                    <!-- Barre de recherche -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Rechercher</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ki-duotone ki-magnifier fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </span>
+                            <input type="text"
+                                   name="search"
+                                   class="form-control"
+                                   placeholder="Rechercher par titre ou description..."
+                                   value="{{ search }}">
+                        </div>
+                    </div>
+
+                    <!-- Filtre par type -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Type de contrat</label>
+                        <select name="type" class="form-select">
+                            <option value="">Tous les types</option>
+                            <option value="Stage" {% if type == 'Stage' %}selected{% endif %}>Stage</option>
+                            <option value="Alternance" {% if type == 'Alternance' %}selected{% endif %}>Alternance</option>
+                            <option value="CDD" {% if type == 'CDD' %}selected{% endif %}>CDD</option>
+                            <option value="CDI" {% if type == 'CDI' %}selected{% endif %}>CDI</option>
+                        </select>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="d-flex gap-2 w-100">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="ki-duotone ki-filter-search fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Filtrer
+                            </button>
+                            {% if search or type %}
+                                <a href="{{ path('app_offre_index') }}" class="btn btn-light-secondary">
+                                    <i class="ki-duotone ki-cross fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Résultats -->
+        {% if search or type %}
+            <div class="alert alert-info d-flex align-items-center mb-6">
+                <i class="ki-duotone ki-information-4 fs-2x me-3">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                <span>{{ offres|length }} offre(s) trouvée(s)</span>
+            </div>
+        {% endif %}
 
         {% if offres is not empty %}
             <div class="row g-6">
@@ -32,11 +136,11 @@
                                     <div class="flex-grow-1">
                                         <h3 class="card-title">
                                             <span class="fw-bold fs-3 text-dark">
-                                                {{ offre.mission|length > 40 ? offre.mission|slice(0,40) ~ '...' : offre.mission }}
+                                                {{ offre.titre|length > 40 ? offre.titre|slice(0,40) ~ '...' : offre.titre }}
                                             </span>
                                         </h3>
                                         <span class="badge badge-light-{{ offre.etat ? 'success' : 'secondary' }} mt-2">
-                                            {{ offre.etat ? 'Actif' : 'Inactif' }}
+                                            {{ offre.etat ? 'Ouverte' : 'Fermée' }}
                                         </span>
                                     </div>
                                 </div>
@@ -60,7 +164,7 @@
                                             <span class="path2"></span>
                                             <span class="path3"></span>
                                         </i>
-                                        <span class="text-gray-800">{{ offre.salaire }}€</span>
+                                        <span class="text-gray-800">{{ offre.salaire }}€ / an</span>
                                     </div>
                                 {% endif %}
 
@@ -71,16 +175,16 @@
 
                                 <!-- Actions -->
                                 <div class="d-flex gap-2">
-                                    <a href="{{ path('app_offre_show', {'id': offre.id}) }}" class="btn btn-sm btn-light-primary flex-grow-1">
+                                    <a href="{{ path('app_offre_show', {'id': offre.id}) }}" class="btn btn-sm btn-primary flex-grow-1">
                                         <i class="ki-duotone ki-eye fs-2">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
                                             <span class="path3"></span>
                                         </i>
-                                        Voir
+                                        Voir l'offre
                                     </a>
-                                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_PRO') %}
-                                        <a href="{{ path('app_offre_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-primary">
+                                    {% if (is_granted('ROLE_ADMIN') or is_granted('ROLE_PARTENAIRE')) and offre.auteur == app.user %}
+                                        <a href="{{ path('app_offre_edit', {'id': offre.id}) }}" class="btn btn-sm btn-light-primary">
                                             <i class="ki-duotone ki-pencil fs-2">
                                                 <span class="path1"></span>
                                                 <span class="path2"></span>

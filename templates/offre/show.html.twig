@@ -1,42 +1,224 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Offre{% endblock %}
+{% block title %}{{ offre.titre }} - Offres d'emploi{% endblock %}
 
 {% block body %}
-    <h1>Offre</h1>
+    <div class="container py-10">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ offre.id }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ offre.description }}</td>
-            </tr>
-            <tr>
-                <th>Mission</th>
-                <td>{{ offre.mission }}</td>
-            </tr>
-            <tr>
-                <th>Type</th>
-                <td>{{ offre.type }}</td>
-            </tr>
-            <tr>
-                <th>Salaire</th>
-                <td>{{ offre.salaire }}</td>
-            </tr>
-            <tr>
-                <th>Etat</th>
-                <td>{{ offre.etat ? 'Yes' : 'No' }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Navigation -->
+        <div class="mb-6">
+            <a href="{{ path('app_offre_index') }}" class="btn btn-light-secondary">
+                <i class="ki-duotone ki-left fs-2"></i>
+                Retour aux offres
+            </a>
+        </div>
 
-    <a href="{{ path('app_offre_index') }}">back to list</a>
+        <div class="row g-6">
+            <!-- Colonne principale (Détails de l'offre) -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-6">
+                    <div class="card-header border-0 pt-6">
+                        <div class="d-flex justify-content-between align-items-start w-100">
+                            <div class="flex-grow-1">
+                                <h1 class="fw-bold text-dark mb-3">{{ offre.titre }}</h1>
+                                <div class="d-flex gap-2 align-items-center flex-wrap">
+                                    <span class="badge badge-{{ offre.etat ? 'success' : 'secondary' }} fs-6">
+                                        {{ offre.etat ? 'Ouverte' : 'Fermée' }}
+                                    </span>
+                                    <span class="badge badge-light-primary fs-6">{{ offre.type }}</span>
+                                    {% if offre.salaire %}
+                                        <span class="badge badge-light-success fs-6">{{ offre.salaire }}€ / an</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    <a href="{{ path('app_offre_edit', {'id': offre.id}) }}">edit</a>
+                    <div class="card-body">
+                        <!-- Description -->
+                        <div class="mb-8">
+                            <h3 class="fs-2 fw-bold text-dark mb-4">
+                                <i class="ki-duotone ki-information-5 fs-2 text-primary me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                Description
+                            </h3>
+                            <p class="text-gray-800 fs-5 lh-lg">{{ offre.description }}</p>
+                        </div>
 
-    {{ include('offre/_delete_form.html.twig') }}
+                        <!-- Missions -->
+                        {% if offre.mission %}
+                            <div class="mb-8">
+                                <h3 class="fs-2 fw-bold text-dark mb-4">
+                                    <i class="ki-duotone ki-notepad fs-2 text-primary me-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    Missions
+                                </h3>
+                                <p class="text-gray-800 fs-5 lh-lg">{{ offre.mission }}</p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Actions pour l'auteur -->
+                        {% if (is_granted('ROLE_ADMIN') or is_granted('ROLE_PARTENAIRE')) and offre.auteur == app.user %}
+                            <div class="separator my-6"></div>
+                            <div class="d-flex gap-3">
+                                <a href="{{ path('app_offre_edit', {'id': offre.id}) }}" class="btn btn-light-primary">
+                                    <i class="ki-duotone ki-pencil fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Modifier l'offre
+                                </a>
+                                {{ include('offre/_delete_form.html.twig') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne latérale (Candidature) -->
+            <div class="col-lg-4">
+                <!-- Informations complémentaires -->
+                <div class="card shadow-sm mb-6">
+                    <div class="card-body">
+                        <h3 class="fs-3 fw-bold text-dark mb-5">Informations</h3>
+
+                        <!-- Auteur -->
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center">
+                                <i class="ki-duotone ki-profile-circle fs-2 text-primary me-3">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                <div>
+                                    <div class="text-gray-500 fs-7">Publié par</div>
+                                    <div class="text-dark fw-bold">
+                                        {{ offre.auteur.prenom }} {{ offre.auteur.nom }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Type de contrat -->
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center">
+                                <i class="ki-duotone ki-briefcase fs-2 text-primary me-3">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <div>
+                                    <div class="text-gray-500 fs-7">Type de contrat</div>
+                                    <div class="text-dark fw-bold">{{ offre.type }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salaire -->
+                        {% if offre.salaire %}
+                            <div class="mb-5">
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-euro fs-2 text-primary me-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    <div>
+                                        <div class="text-gray-500 fs-7">Salaire</div>
+                                        <div class="text-dark fw-bold">{{ offre.salaire }}€ / an</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Nombre de candidatures -->
+                        <div class="mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="ki-duotone ki-people fs-2 text-primary me-3">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                                <div>
+                                    <div class="text-gray-500 fs-7">Candidatures</div>
+                                    <div class="text-dark fw-bold">{{ offre.candidatures|length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulaire de candidature -->
+                {% if offre.etat and app.user and offre.auteur != app.user %}
+                    <div class="card shadow-sm border-primary">
+                        <div class="card-header bg-primary">
+                            <h3 class="card-title text-white fw-bold">
+                                <i class="ki-duotone ki-send fs-2 text-white me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Postuler à cette offre
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            {% if dejaCandidature %}
+                                <div class="alert alert-success d-flex align-items-center">
+                                    <i class="ki-duotone ki-check-circle fs-2x text-success me-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <div>
+                                        <h4 class="mb-1 text-success">Candidature envoyée</h4>
+                                        <span>Vous avez déjà postulé à cette offre.</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <form method="post" action="{{ path('app_offre_postuler', {'id': offre.id}) }}">
+                                    <div class="mb-5">
+                                        <label for="lettre_motivation" class="form-label fw-bold required">Lettre de motivation</label>
+                                        <textarea
+                                            id="lettre_motivation"
+                                            name="lettre_motivation"
+                                            class="form-control"
+                                            rows="8"
+                                            placeholder="Expliquez votre motivation et pourquoi vous êtes le candidat idéal pour ce poste..."
+                                            required></textarea>
+                                        <div class="form-text">Minimum 50 caractères</div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="ki-duotone ki-send fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        Envoyer ma candidature
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% elseif not offre.etat %}
+                    <div class="alert alert-warning d-flex align-items-center">
+                        <i class="ki-duotone ki-information-2 fs-2x text-warning me-3">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                        </i>
+                        <div>
+                            <h4 class="mb-1 text-warning">Offre fermée</h4>
+                            <span>Cette offre n'accepte plus de candidatures.</span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
 {% endblock %}

@@ -80,6 +80,6 @@ final class PostController extends AbstractController
             $this->addFlash('error', 'Vous n’avez pas le droit de supprimer ce post.');
         }
 
-        return $this->redirectToRoute('app_canal_view', ['id' => $post->getRefCanal()->getId()]);
+        return $this->redirectToRoute('app_canal_view', ['id' => $post->getCanal()->getId()]);
     }
 }

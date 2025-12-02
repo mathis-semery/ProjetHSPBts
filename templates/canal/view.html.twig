@@ -54,9 +54,9 @@
                                 {% for reponse in post.reponses %}
                                     <div class="d-flex align-items-start mb-4">
                                         <div class="symbol symbol-40px symbol-circle me-3">
-                                        <span class="symbol-label bg-light-primary text-primary fw-bold">
-                                            {{ reponse.refUser.userIdentifier|first|upper }}
-                                        </span>
+                            <span class="symbol-label bg-light-primary text-primary fw-bold">
+                                {{ reponse.refUser.userIdentifier|first|upper }}
+                            </span>
                                         </div>
                                         <div>
                                             <div class="fw-semibold text-dark">{{ reponse.refUser.userIdentifier }}</div>
@@ -64,10 +64,31 @@
                                             <div class="text-muted fs-8">{{ reponse.dateHeure|date('d/m/Y H:i') }}</div>
 
                                             {% if app.user and (app.user == reponse.refUser or 'ROLE_ADMIN' in app.user.roles) %}
-                                                <form method="post" action="{{ path('app_reponse_delete', {'id': reponse.id}) }}" onsubmit="return confirm('Confirmer la suppression de cette réponse ?');">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reponse.id) }}">
-                                                    <button class="btn btn-sm btn-danger mt-1">Supprimer</button>
-                                                </form>
+                                                <button type="button" class="btn btn-sm btn-danger mt-1" data-bs-toggle="modal" data-bs-target="#deleteReponseModal{{ reponse.id }}">
+                                                    Supprimer
+                                                </button>
+
+                                                <div class="modal fade" id="deleteReponseModal{{ reponse.id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title text-danger">Supprimer cette réponse ?</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>Cette action est <strong class="text-danger">définitive</strong>.</p>
+                                                                <p>{{ reponse.texte }}</p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                                                                <form method="post" action="{{ path('app_reponse_delete', {'id': reponse.id}) }}">
+                                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reponse.id) }}">
+                                                                    <button class="btn btn-danger">Confirmer la suppression</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -87,10 +108,31 @@
                     {% endif %}
 
                     {% if app.user and (app.user == post.refUser or 'ROLE_ADMIN' in app.user.roles) %}
-                        <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" onsubmit="return confirm('Confirmer la suppression de ce post ?');" class="mt-3">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                            <button class="btn btn-sm btn-danger">Supprimer ce post</button>
-                        </form>
+                        <button type="button" class="btn btn-sm btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}">
+                            Supprimer ce post
+                        </button>
+
+                        <div class="modal fade" id="deletePostModal{{ post.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-danger">Supprimer ce post ?</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Cette action est <strong class="text-danger">définitive</strong>.</p>
+                                        <p>{{ post.texte }}</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                                        <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                            <button class="btn btn-danger">Confirmer la suppression</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -109,6 +151,5 @@
                 Retour à la liste des canaux
             </a>
         </div>
-
     </div>
 {% endblock %}

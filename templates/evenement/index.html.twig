@@ -1,109 +1,213 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gestion des Événements{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link href="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.css" rel="stylesheet">
-    <style>
-        .dt-search input {
-            border-radius: 0.475rem !important;
-            padding: 0.5rem 1rem;
-        }
-        .dt-length select {
-            border-radius: 0.475rem !important;
-            padding: 0.5rem 1rem;
-        }
-    </style>
-{% endblock %}
+{% block title %}Événements{% endblock %}
 
 {% block body %}
-    <div class="d-flex justify-content-between align-items-center mb-6">
-        <h1 class="h2 mb-0">Gestion des Événements</h1>
-        <a href="{{ path('app_evenement_new') }}" class="btn btn-primary">
-            <i class="ki-duotone ki-plus fs-2"></i>
-            <span class="ms-1">Ajouter un événement</span>
-        </a>
-    </div>
+    <div class="container py-10">
 
-    {% if evenements is empty %}
-        <div class="alert alert-light-primary d-flex align-items-center p-5 mb-0">
-            <i class="ki-duotone ki-information fs-2x text-primary me-4"></i>
-            <div class="d-flex flex-column">
-                <span class="fw-bold fs-6">Aucun événement</span>
-                <span>Aucun événement n’a été créé pour le moment.</span>
+        <!-- Header -->
+        <div class="card mb-6">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div>
+                    <h1 class="fs-2hx fw-bold text-dark mb-2">
+                        Événements
+                    </h1>
+                    <p class="text-gray-600 mb-0">
+                        Découvrez et participez aux événements du groupe GDH
+                    </p>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 mt-md-0">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_evenement_new') }}" class="btn btn-primary">
+                            <i class="ki-duotone ki-plus fs-2"></i>
+                            Créer un événement
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    {% else %}
-        <div class="table-responsive">
-            <table id="kt_datatable_evenements" class="table align-middle table-row-dashed fs-6 gy-5">
-                <thead>
-                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                    <th class="min-w-50px">ID</th>
-                    <th class="min-w-100px">Type</th>
-                    <th class="min-w-150px">Titre</th>
-                    <th class="min-w-200px">Adresse</th>
-                    <th class="text-center min-w-100px">Places</th>
-                    <th class="min-w-150px">Éléments requis</th>
-                    <th class="text-end min-w-125px">Actions</th>
-                </tr>
-                </thead>
-                <tbody class="fw-semibold text-gray-700">
-                {% for evenement in evenements %}
-                    <tr>
-                        <td>{{ evenement.id }}</td>
-                        <td>
-                            <span class="badge badge-light-{{ {'formation': 'info', 'rencontre': 'success', 'atelier': 'primary', 'autre': 'secondary'}[evenement.type|default('autre')]|default('secondary') }} fw-bold">
-                                {{ evenement.type|capitalize }}
-                            </span>
-                        </td>
-                        <td><strong>{{ evenement.titre }}</strong></td>
-                        <td>{{ evenement.adresse ?: '—' }}</td>
-                        <td class="text-center">{{ evenement.nombreDePlace ?? 'Illimité' }}</td>
-                        <td>
-                            {% if evenement.elementRequis %}
-                                {{ evenement.elementRequis|length > 40 ? evenement.elementRequis|slice(0, 40) ~ '…' : evenement.elementRequis }}
-                            {% else %}
-                                <span class="text-muted">—</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-end">
-                            <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="btn btn-sm btn-outline-info">Voir</a>
-                            <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
-                            <form method="post" action="{{ path('app_evenement_delete', {'id': evenement.id}) }}" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
-{% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    <script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const table = new DataTable('#kt_datatable_evenements', {
-                responsive: true,
-                search: {
-                    return: true
-                },
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/fr-FR.json'
-                },
-                order: [[0, 'desc']],
-                columnDefs: [
-                    { orderable: true, targets: [0] },
-                    { orderable: true, targets: [1] },
-                    { orderable: true, targets: [2] },
-                    { orderable: false, targets: [6] }
-                ]
-            });
-        });
-    </script>
+        <!-- Barre de recherche et filtres -->
+        <div class="card mb-6">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_evenement_index') }}" class="row g-4">
+                    <!-- Barre de recherche -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Rechercher</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ki-duotone ki-magnifier fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </span>
+                            <input type="text"
+                                   name="search"
+                                   class="form-control"
+                                   placeholder="Rechercher par titre ou description..."
+                                   value="{{ search|default('') }}">
+                        </div>
+                    </div>
+
+                    <!-- Filtre par type -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Type d'événement</label>
+                        <select name="type" class="form-select">
+                            <option value="">Tous les types</option>
+                            <option value="Conférence" {% if type|default('') == 'Conférence' %}selected{% endif %}>Conférence</option>
+                            <option value="Atelier" {% if type|default('') == 'Atelier' %}selected{% endif %}>Atelier</option>
+                            <option value="Webinaire" {% if type|default('') == 'Webinaire' %}selected{% endif %}>Webinaire</option>
+                            <option value="Formation" {% if type|default('') == 'Formation' %}selected{% endif %}>Formation</option>
+                            <option value="Networking" {% if type|default('') == 'Networking' %}selected{% endif %}>Networking</option>
+                            <option value="Séminaire" {% if type|default('') == 'Séminaire' %}selected{% endif %}>Séminaire</option>
+                        </select>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="d-flex gap-2 w-100">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="ki-duotone ki-filter-search fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Filtrer
+                            </button>
+                            {% if search|default('') or type|default('') %}
+                                <a href="{{ path('app_evenement_index') }}" class="btn btn-light-secondary">
+                                    <i class="ki-duotone ki-cross fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Résultats -->
+        {% if search|default('') or type|default('') %}
+            <div class="alert alert-info d-flex align-items-center mb-6">
+                <i class="ki-duotone ki-information-4 fs-2x me-3">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                <span>{{ evenements|length }} événement(s) trouvé(s)</span>
+            </div>
+        {% endif %}
+
+        {% if evenements is not empty %}
+            <div class="row g-6">
+                {% for evenement in evenements %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card card-flush h-100 shadow-sm hover-elevate-up transition-all">
+                            <div class="card-header border-0 pt-6">
+                                <div class="d-flex justify-content-between align-items-start w-100">
+                                    <div class="flex-grow-1">
+                                        <h3 class="card-title">
+                                            <span class="fw-bold fs-3 text-dark">
+                                                {{ evenement.titre|length > 40 ? evenement.titre|slice(0,40) ~ '...' : evenement.titre }}
+                                            </span>
+                                        </h3>
+                                        <span class="badge badge-light-primary mt-2">
+                                            {{ evenement.type }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-body py-5">
+                                <!-- Date -->
+                                {% if evenement.dateDebut %}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="ki-duotone ki-calendar fs-2 text-primary me-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        <span class="text-gray-800 fw-semibold">
+                                            {{ evenement.dateDebut|date('d/m/Y à H:i') }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Adresse -->
+                                {% if evenement.adresse %}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="ki-duotone ki-geolocation fs-2 text-success me-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        <span class="text-gray-800">
+                                            {{ evenement.adresse|length > 30 ? evenement.adresse|slice(0,30) ~ '...' : evenement.adresse }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Places disponibles -->
+                                {% if evenement.nombreDePlace %}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="ki-duotone ki-profile-user fs-2 text-warning me-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                        </i>
+                                        <span class="text-gray-800">
+                                            {% if evenement.placesRestantes > 0 %}
+                                                {{ evenement.placesRestantes }} place(s) restante(s)
+                                            {% else %}
+                                                <span class="text-danger fw-bold">Complet</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Description -->
+                                <p class="text-gray-700 mt-4 mb-4">
+                                    {{ evenement.description|length > 100 ? evenement.description|slice(0,100) ~ '...' : evenement.description }}
+                                </p>
+
+                                <!-- Actions -->
+                                <div class="d-flex gap-2">
+                                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="btn btn-sm btn-primary flex-grow-1">
+                                        <i class="ki-duotone ki-eye fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Voir détails
+                                    </a>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-light-primary">
+                                            <i class="ki-duotone ki-pencil fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info d-flex align-items-center p-5">
+                <i class="ki-duotone ki-information-5 fs-2hx text-info me-4">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                <div class="d-flex flex-column">
+                    <h4 class="mb-1 text-info">Aucun événement disponible</h4>
+                    <span>Aucun événement n'est actuellement programmé.</span>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
 {% endblock %}

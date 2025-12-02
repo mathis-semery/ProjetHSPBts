@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\EvenementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
@@ -30,8 +31,14 @@ class Evenement
     #[ORM\Column(nullable: true)]
     private ?int $nombreDePlace = null;
 
-    #[ORM\Column(length: 255 , nullable:  true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $elementRequis = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateDebut = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateFin = null;
 
     /**
      * @var Collection<int, Inscription>
@@ -114,9 +121,33 @@ class Evenement
         return $this->elementRequis;
     }
 
-    public function setElementRequis(string $elementRequis): static
+    public function setElementRequis(?string $elementRequis): static
     {
         $this->elementRequis = $elementRequis;
+
+        return $this;
+    }
+
+    public function getDateDebut(): ?\DateTimeInterface
+    {
+        return $this->dateDebut;
+    }
+
+    public function setDateDebut(?\DateTimeInterface $dateDebut): static
+    {
+        $this->dateDebut = $dateDebut;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(?\DateTimeInterface $dateFin): static
+    {
+        $this->dateFin = $dateFin;
 
         return $this;
     }
@@ -149,5 +180,45 @@ class Evenement
         }
 
         return $this;
+    }
+
+    /**
+     * Retourne le nombre d'inscriptions pour cet événement
+     */
+    public function getNombreInscriptions(): int
+    {
+        return $this->inscriptions->count();
+    }
+
+    /**
+     * Vérifie s'il reste des places disponibles
+     */
+    public function hasPlacesDisponibles(): bool
+    {
+        if ($this->nombreDePlace === null) {
+            return true;
+        }
+
+        return $this->getNombreInscriptions() < $this->nombreDePlace;
+    }
+
+    /**
+     * Retourne le nombre de places restantes
+     */
+    public function getPlacesRestantes(): ?int
+    {
+        if ($this->nombreDePlace === null) {
+            return null;
+        }
+
+        return max(0, $this->nombreDePlace - $this->getNombreInscriptions());
+    }
+
+    /**
+     * Représentation en string de l'événement
+     */
+    public function __toString(): string
+    {
+        return $this->titre ?? '';
     }
 }

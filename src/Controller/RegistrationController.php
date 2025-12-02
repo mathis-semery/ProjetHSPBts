@@ -83,7 +83,16 @@ class RegistrationController extends AbstractController
 
 
         $user->setVerificationToken(null); // Le token est utilisé et doit être effacé
-        $user->setRoles(['ROLE_ATTENTE_VERIFICATION']);
+
+        // Conserver le rôle métier et ajouter ROLE_ATTENTE_VERIFICATION
+        $currentRoles = $user->getRolesForForm();
+        $metierRoles = array_filter($currentRoles, function($role) {
+            return in_array($role, ['ROLE_ELEVE', 'ROLE_MEDECIN', 'ROLE_PARTENAIRE']);
+        });
+
+        $newRoles = array_merge(['ROLE_ATTENTE_VERIFICATION'], $metierRoles);
+        $user->setRoles(array_values(array_unique($newRoles)));
+
         $entityManager->persist($user);
 
         $entityManager->flush();

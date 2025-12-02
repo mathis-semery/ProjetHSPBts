@@ -41,23 +41,39 @@ class UserPendingController extends AbstractController
             return $role !== 'ROLE_ATTENTE_VERIFICATION';
         });
 
-        // S'assurer qu'il y a au moins un rôle métier
-        if (empty($newRoles)) {
-            $newRoles = ['ROLE_USER'];
+        // S'assurer qu'il y a au moins un rôle métier basé sur le champ metier
+        $hasMetierRole = !empty(array_filter($newRoles, function($role) {
+            return in_array($role, ['ROLE_ELEVE', 'ROLE_MEDECIN', 'ROLE_PARTENAIRE', 'ROLE_GESTIONNAIRE']);
+        }));
+
+        if (!$hasMetierRole) {
+            // Assigner le rôle métier basé sur le champ metier de l'utilisateur
+            $metier = strtoupper(trim($user->getMetier() ?? ''));
+            $metierToRole = [
+                'ELEVE' => 'ROLE_ELEVE',
+                'ETUDIANT' => 'ROLE_ELEVE',
+                'MEDECIN' => 'ROLE_MEDECIN',
+                'PARTENAIRE' => 'ROLE_PARTENAIRE',
+                'GESTIONNAIRE' => 'ROLE_GESTIONNAIRE',
+            ];
+
+            if (isset($metierToRole[$metier])) {
+                $newRoles[] = $metierToRole[$metier];
+            }
         }
 
-        $user->setRoles(array_values($newRoles));
+        $user->setRoles(array_values(array_unique($newRoles)));
         $entityManager->flush();
 
         $email = (new Email())
             ->from('no-reply@' . $_ENV['NOM_DOMAINE'] ?? 'localhost')
             ->to($user->getEmail())
-            ->subject('Votre inscription a été refusée')
+            ->subject('Votre inscription a été validée')
             ->html(<<<HTML
 <p>Bonjour {$user->getPrenom()},</p>
-<p>Nous vous informons que votre demande d’inscription a été validée.</p>
-<p>Pour toute question, veuillez contacter l’administrateur du site.</p>
-<p>Cordialement,<br>L’équipe HSP</p>
+<p>Nous vous informons que votre demande d'inscription a été validée.</p>
+<p>Pour toute question, veuillez contacter l'administrateur du site.</p>
+<p>Cordialement,<br>L'équipe HSP</p>
 HTML
             );
 

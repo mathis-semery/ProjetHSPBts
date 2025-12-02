@@ -1,46 +1,196 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Evenement{% endblock %}
+{% block title %}{{ evenement.titre }} - Événements{% endblock %}
 
 {% block body %}
-    <h1>Evenement</h1>
+    <div class="container py-10">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ evenement.id }}</td>
-            </tr>
-            <tr>
-                <th>Type</th>
-                <td>{{ evenement.type }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ evenement.titre }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ evenement.description }}</td>
-            </tr>
-            <tr>
-                <th>Adresse</th>
-                <td>{{ evenement.adresse }}</td>
-            </tr>
-            <tr>
-                <th>NombreDePlace</th>
-                <td>{{ evenement.nombreDePlace }}</td>
-            </tr>
-            <tr>
-                <th>ElementRequis</th>
-                <td>{{ evenement.elementRequis }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="mb-6">
+            <a href="{{ path('app_evenement_index') }}" class="btn btn-light-secondary">
+                <i class="ki-duotone ki-left fs-2"></i>
+                Retour aux événements
+            </a>
+        </div>
 
-    <a href="{{ path('app_evenement_index') }}">back to list</a>
+        <div class="row g-6">
 
-    <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}">edit</a>
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-6">
+                    <div class="card-header border-0 pt-6">
+                        <div class="d-flex justify-content-between align-items-start w-100">
+                            <div class="flex-grow-1">
+                                <h1 class="fw-bold text-dark mb-3">{{ evenement.titre }}</h1>
+                                <div class="d-flex gap-2 align-items-center flex-wrap">
+                                    <span class="badge badge-light-primary fs-6">{{ evenement.type }}</span>
+                                    {% if evenement.nombreDePlace %}
+                                        {% if evenement.placesRestantes > 0 %}
+                                            <span class="badge badge-light-success fs-6">
+                                                {{ evenement.placesRestantes }} place(s) disponible(s)
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-light-danger fs-6">Complet</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    {{ include('evenement/_delete_form.html.twig') }}
+                    <div class="card-body">
+                        <!-- Description -->
+                        <div class="mb-8">
+                            <h3 class="fs-2 fw-bold text-dark mb-4">
+                                <i class="ki-duotone ki-information-5 fs-2 text-primary me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                Description
+                            </h3>
+                            <p class="text-gray-800 fs-5 lh-lg">{{ evenement.description ?: 'Aucune description disponible.' }}</p>
+                        </div>
+
+                        <!-- Éléments requis -->
+                        {% if evenement.elementRequis %}
+                            <div class="mb-8">
+                                <h3 class="fs-2 fw-bold text-dark mb-4">
+                                    <i class="ki-duotone ki-notepad fs-2 text-primary me-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    Éléments requis
+                                </h3>
+                                <p class="text-gray-800 fs-5 lh-lg">{{ evenement.elementRequis }}</p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Actions pour l'admin -->
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <div class="separator my-6"></div>
+                            <div class="d-flex gap-3">
+                                <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-light-primary">
+                                    <i class="ki-duotone ki-pencil fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Modifier l'événement
+                                </a>
+                                {{ include('evenement/_delete_form.html.twig') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne latérale (Informations) -->
+            <div class="col-lg-4">
+                <!-- Informations complémentaires -->
+                <div class="card shadow-sm mb-6">
+                    <div class="card-body">
+                        <h3 class="fs-3 fw-bold text-dark mb-5">Informations</h3>
+
+                        <!-- Type d'événement -->
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center">
+                                <i class="ki-duotone ki-tag fs-2 text-primary me-3">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                <div>
+                                    <div class="text-gray-500 fs-7">Type d'événement</div>
+                                    <div class="text-dark fw-bold">{{ evenement.type }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Date de début -->
+                        {% if evenement.dateDebut %}
+                            <div class="mb-5">
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-calendar fs-2 text-primary me-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <div>
+                                        <div class="text-gray-500 fs-7">Date de début</div>
+                                        <div class="text-dark fw-bold">{{ evenement.dateDebut|date('d/m/Y à H:i') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Date de fin -->
+                        {% if evenement.dateFin %}
+                            <div class="mb-5">
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-calendar-tick fs-2 text-primary me-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <div>
+                                        <div class="text-gray-500 fs-7">Date de fin</div>
+                                        <div class="text-dark fw-bold">{{ evenement.dateFin|date('d/m/Y à H:i') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Adresse -->
+                        {% if evenement.adresse %}
+                            <div class="mb-5">
+                                <div class="d-flex align-items-start">
+                                    <i class="ki-duotone ki-geolocation fs-2 text-primary me-3 mt-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <div>
+                                        <div class="text-gray-500 fs-7">Lieu</div>
+                                        <div class="text-dark fw-bold">{{ evenement.adresse }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Nombre de places -->
+                        {% if evenement.nombreDePlace %}
+                            <div class="mb-5">
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-profile-user fs-2 text-primary me-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                    <div>
+                                        <div class="text-gray-500 fs-7">Capacité</div>
+                                        <div class="text-dark fw-bold">{{ evenement.nombreDePlace }} place(s)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Nombre d'inscriptions -->
+                        <div class="mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="ki-duotone ki-people fs-2 text-primary me-3">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                                <div>
+                                    <div class="text-gray-500 fs-7">Inscriptions</div>
+                                    <div class="text-dark fw-bold">{{ evenement.inscriptions|length }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 {% endblock %}

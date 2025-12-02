@@ -3,7 +3,7 @@
      data-kt-sticky-name="header"
      data-kt-sticky-offset="{default: '200px', lg: '300px'}">
     <!--begin::Container-->
-    <div class="container-xxl d-flex align-items-center">
+    <div class="container-fluid d-flex align-items-center">
 
         <!--begin::Heaeder menu toggle-->
         <div class="d-flex align-items-center d-lg-none ms-n2 me-3" title="Show aside menu">
@@ -182,6 +182,15 @@
                                                 {% endif %}
                                             </div>
                                             <a href="{{ path('app_profile') }}" class="fw-semibold text-muted text-hover-primary fs-7">{{ app.user.email }}</a>
+                                            {% if app.user.refEntreprise %}
+                                                <div class="text-muted fs-8 mt-1">
+                                                    <i class="ki-duotone ki-briefcase fs-8">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                    {{ app.user.refEntreprise.nom }}
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

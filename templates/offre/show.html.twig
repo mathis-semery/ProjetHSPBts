@@ -88,6 +88,26 @@
                     <div class="card-body">
                         <h3 class="fs-3 fw-bold text-dark mb-5">Informations</h3>
 
+                        <!-- Entreprise -->
+                        {% if offre.auteur.refEntreprise %}
+                            <div class="mb-5">
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-office-bag fs-2 text-primary me-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                    <div>
+                                        <div class="text-gray-500 fs-7">Entreprise</div>
+                                        <div class="text-dark fw-bold">
+                                            {{ offre.auteur.refEntreprise.nom }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
                         <!-- Auteur -->
                         <div class="mb-5">
                             <div class="d-flex align-items-center">
@@ -146,9 +166,17 @@
                                     <span class="path4"></span>
                                     <span class="path5"></span>
                                 </i>
-                                <div>
+                                <div class="flex-grow-1">
                                     <div class="text-gray-500 fs-7">Candidatures</div>
-                                    <div class="text-dark fw-bold">{{ offre.candidatures|length }}</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-dark fw-bold">{{ offre.candidatures|length }}</span>
+                                        {% if peutVoirCandidatures and candidaturesEnAttente > 0 %}
+                                            <span class="badge badge-warning badge-circle pulse pulse-warning" title="{{ candidaturesEnAttente }} nouvelle(s) candidature(s)">
+                                                {{ candidaturesEnAttente }}
+                                                <span class="pulse-ring"></span>
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -219,6 +247,167 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- Section des candidatures (visible uniquement pour l'entreprise) -->
+        {% if peutVoirCandidatures %}
+            <div class="row mt-6">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header border-0 pt-6">
+                            <h3 class="card-title align-items-start flex-column">
+                                <div class="d-flex align-items-center gap-3 mb-1">
+                                    <span class="card-label fw-bold fs-2">Candidatures</span>
+                                    {% if candidaturesEnAttente > 0 %}
+                                        <span class="badge badge-warning pulse pulse-warning">
+                                            {{ candidaturesEnAttente }} en attente
+                                            <span class="pulse-ring"></span>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <span class="text-muted fw-semibold fs-7">{{ offre.candidatures|length }} candidature(s) reçue(s)</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0">
+                            {% if offre.candidatures|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3">
+                                    <thead>
+                                        <tr class="fw-bold text-muted">
+                                            <th class="min-w-150px">Candidat</th>
+                                            <th class="min-w-120px">Email</th>
+                                            <th class="min-w-120px">Formation</th>
+                                            <th class="min-w-120px">Métier</th>
+                                            <th class="min-w-100px">Statut</th>
+                                            <th class="min-w-200px text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for candidature in offre.candidatures %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="symbol symbol-45px symbol-circle me-3 bg-light-primary">
+                                                            <span class="symbol-label fs-6 fw-bold text-primary">
+                                                                {{ candidature.refUser.prenom|first|upper }}{{ candidature.refUser.nom|first|upper }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="d-flex flex-column">
+                                                            <span class="text-dark fw-bold text-hover-primary fs-6">
+                                                                {{ candidature.refUser.nom }} {{ candidature.refUser.prenom }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="text-muted fw-semibold text-muted d-block fs-7">
+                                                        {{ candidature.refUser.email }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-dark fw-semibold d-block fs-7">
+                                                        {{ candidature.refUser.formation ?? 'Non renseigné' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-dark fw-semibold d-block fs-7">
+                                                        {{ candidature.refUser.metier }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {% if candidature.etat is null %}
+                                                        <span class="badge badge-light-warning">En attente</span>
+                                                    {% elseif candidature.etat %}
+                                                        <span class="badge badge-light-success">Acceptée</span>
+                                                    {% else %}
+                                                        <span class="badge badge-light-danger">Refusée</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-end">
+                                                    <a href="#" class="btn btn-sm btn-light-primary me-2" data-bs-toggle="modal" data-bs-target="#modalLettre{{ candidature.id }}">
+                                                        <i class="ki-duotone ki-eye fs-4">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                            <span class="path3"></span>
+                                                        </i>
+                                                        Voir lettre
+                                                    </a>
+                                                    <a href="{{ path('app_profile', {id: candidature.refUser.id}) }}" class="btn btn-sm btn-light-info me-2">
+                                                        <i class="ki-duotone ki-profile-user fs-4">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                            <span class="path3"></span>
+                                                        </i>
+                                                        Profil
+                                                    </a>
+                                                    {% if candidature.etat is null %}
+                                                        <a href="{{ path('app_candidature_accepter', {id: candidature.id}) }}" class="btn btn-sm btn-light-success me-2">
+                                                            <i class="ki-duotone ki-check fs-4">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                            </i>
+                                                            Accepter
+                                                        </a>
+                                                        <a href="{{ path('app_candidature_refuser', {id: candidature.id}) }}" class="btn btn-sm btn-light-danger">
+                                                            <i class="ki-duotone ki-cross fs-4">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                            </i>
+                                                            Refuser
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+
+                                            <!-- Modal pour voir la lettre de motivation -->
+                                            <div class="modal fade" id="modalLettre{{ candidature.id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h3 class="modal-title">Lettre de motivation</h3>
+                                                            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal">
+                                                                <i class="ki-duotone ki-cross fs-1">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                </i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="mb-5">
+                                                                <h4 class="fw-bold mb-3">Candidat</h4>
+                                                                <p class="text-muted">{{ candidature.refUser.nom }} {{ candidature.refUser.prenom }}</p>
+                                                            </div>
+                                                            <div>
+                                                                <h4 class="fw-bold mb-3">Message</h4>
+                                                                <div class="text-gray-800 fs-6 lh-lg">
+                                                                    {{ candidature.lettre|nl2br }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                                <div class="text-center py-10">
+                                    <i class="ki-duotone ki-file-deleted fs-5x text-muted mb-5">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <h3 class="text-gray-600 fw-semibold mb-2">Aucune candidature</h3>
+                                    <p class="text-muted fs-6">Il n'y a pas encore de candidatures pour cette offre.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
     </div>
 {% endblock %}

@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class OffreController extends AbstractController
 {
     #[Route(name: 'app_offre_index', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function index(Request $request, OffreRepository $offreRepository): Response
     {
         $search = $request->query->get('search', '');
@@ -92,10 +93,12 @@ final class OffreController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_offre_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function show(Offre $offre, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         $dejaCandidature = false;
+        $peutVoirCandidatures = false;
 
         // Vérifier si l'utilisateur a déjà postulé
         if ($user) {
@@ -103,11 +106,31 @@ final class OffreController extends AbstractController
                 ->findOneBy(['refUser' => $user, 'refOffre' => $offre]);
 
             $dejaCandidature = $candidatureExistante !== null;
+
+            // Vérifier si l'utilisateur peut voir les candidatures
+            // Admin peut tout voir OU si l'utilisateur est de la même entreprise que l'auteur
+            if ($this->isGranted('ROLE_ADMIN')) {
+                $peutVoirCandidatures = true;
+            } elseif ($user->getrefEntreprise() && $offre->getAuteur()->getrefEntreprise()) {
+                $peutVoirCandidatures = $user->getrefEntreprise()->getId() === $offre->getAuteur()->getrefEntreprise()->getId();
+            }
+        }
+
+        // Compter les candidatures en attente
+        $candidaturesEnAttente = 0;
+        if ($peutVoirCandidatures) {
+            foreach ($offre->getCandidatures() as $candidature) {
+                if ($candidature->isEtat() === null) {
+                    $candidaturesEnAttente++;
+                }
+            }
         }
 
         return $this->render('offre/show.html.twig', [
             'offre' => $offre,
             'dejaCandidature' => $dejaCandidature,
+            'peutVoirCandidatures' => $peutVoirCandidatures,
+            'candidaturesEnAttente' => $candidaturesEnAttente,
         ]);
     }
 

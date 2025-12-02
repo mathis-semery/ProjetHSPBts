@@ -4,35 +4,37 @@ namespace App\Form;
 
 use App\Entity\Canal;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class CanalType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom', null, [
+            ->add('nom', TextType::class, [
                 'label' => 'Nom du canal',
-                'attr' => ['class' => 'form-control form-control-solid', 'placeholder' => 'Ex : Général, Annonces...'],
+                'attr' => ['placeholder' => 'Ex : Général, Annonces...']
             ])
-            ->add('description', null, [
+            ->add('description', TextType::class, [
                 'label' => 'Description',
-                'attr' => ['class' => 'form-control form-control-solid', 'placeholder' => 'Décrivez le but du canal...'],
+                'attr' => ['placeholder' => 'Décrivez le canal...']
             ])
             ->add('ListeAuto', ChoiceType::class, [
-                'choices'  => [
+                'label' => 'Rôles et spécialités autorisés',
+                'choices' => [
                     'Médecin' => 'MEDECIN',
                     'Partenaire' => 'PARTENAIRE',
-                    'Élève/Étudiant' => 'ELEVE',
+                    'Etudiant' => 'ETUDIANT',
+                    'Cardiologie' => 'CARDIOLOGIE',
+                    'Neurologie' => 'NEUROLOGIE',
+                    'Dermatologie' => 'DERMATOLOGIE',
                 ],
-                'multiple' => true,  // permet de sélectionner plusieurs rôles
-                'expanded' => true, // true = checkboxes, false = select multiple
-                'required' => false,
-                'label' => 'Liste automatique (Rôles métiers autorisés)',
-                'attr' => ['class' => 'form-select'],
-                'help' => 'Sélectionnez les métiers autorisés à accéder à ce canal',
+                'multiple' => true,
+                'expanded' => false,
+                'attr' => ['class' => 'form-select', 'size' => 8]
             ]);
     }
 

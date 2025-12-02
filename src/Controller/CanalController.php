@@ -26,7 +26,6 @@ class CanalController extends AbstractController
             if (in_array('ROLE_ADMIN', $user->getRoles())) {
                 return true; // Admin voit tout
             }
-            // Transformation des métiers en rôles pour la vérification
             $metiersAutorise = array_map('trim', explode(',', $canal->getListeAuto() ?? ''));
             $rolesAutorise = array_map(function($metier) {
                 return 'ROLE_' . strtoupper($metier);
@@ -79,7 +78,6 @@ class CanalController extends AbstractController
                 return 'ROLE_' . strtoupper($metier);
             }, $metiersAutorise);
 
-            // Vérifier si l'utilisateur a au moins un des rôles autorisés
             $userRoles = $user->getRoles();
             $hasAccess = !empty(array_intersect($userRoles, $rolesAutorise));
 
@@ -88,7 +86,6 @@ class CanalController extends AbstractController
             }
         }
 
-        // Formulaire création post
         $post = new Post();
         $formPost = $this->createForm(PostType::class, $post);
         $formPost->handleRequest($request);
@@ -103,7 +100,6 @@ class CanalController extends AbstractController
             return $this->redirectToRoute('app_canal_view', ['id' => $canal->getId()]);
         }
 
-        // Formulaire réponse à un post
         if ($request->isMethod('POST') && $request->request->has('texte') && $request->request->has('post_id')) {
             $texte = trim($request->request->get('texte'));
             $postId = $request->request->getInt('post_id');
@@ -185,4 +181,23 @@ class CanalController extends AbstractController
 
         return $this->redirectToRoute('app_canal_view', ['id' => $reponse->getRefPost()->getCanal()->getId()]);
     }
+    #[Route('/{id}/delete', name: 'app_canal_delete', methods: ['POST'])]
+    public function delete(Request $request, Canal $canal, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && $canal->getRefUser() !== $user) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce canal.');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$canal->getId(), $request->request->get('_token'))) {
+            $em->remove($canal);
+            $em->flush();
+            $this->addFlash('success', 'Canal supprimé !');
+        }
+
+        return $this->redirectToRoute('app_canal_index');
+    }
+
 }

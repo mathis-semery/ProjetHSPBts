@@ -33,7 +33,6 @@
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <!-- Bouton suppression avec modal -->
                     <button type="button"
                             class="btn btn-danger"
                             data-bs-toggle="modal"
@@ -52,7 +51,6 @@
         </div>
     </div>
 
-    <!-- Modal suppression -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -75,9 +73,7 @@
 
                     <form method="post" action="{{ path('app_canal_delete', {'id': canal.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ canal.id) }}">
-                        <button class="btn btn-danger">
-                            Confirmer la suppression
-                        </button>
+                        <button class="btn btn-danger">Confirmer la suppression</button>
                     </form>
                 </div>
 

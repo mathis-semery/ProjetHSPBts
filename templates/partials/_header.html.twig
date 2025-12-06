@@ -76,14 +76,6 @@
                         </div>
                         <!--end::Menu item-->
 
-                        <!--begin::Menu item - Posts-->
-                        <div class="menu-item me-0 me-lg-2">
-                            <a class="menu-link py-3" href="{{ path('app_post_index') }}">
-                                <span class="menu-title">Posts</span>
-                            </a>
-                        </div>
-                        <!--end::Menu item-->
-
                         <!--begin::Menu item - Admin (Admin only)-->
                         {% if is_granted('ROLE_ADMIN') %}
                             <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}"

@@ -1,0 +1,257 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+    <div class="container py-10">
+        <div class="d-flex justify-content-between align-items-center mb-6">
+            <h1 class="fw-bold text-dark">Mon Profil</h1>
+        </div>
+
+        <div class="row g-6">
+            <!-- Informations personnelles -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-header border-0 pt-6">
+                        <h3 class="card-title">
+                            <i class="ki-duotone ki-profile-circle fs-2 text-primary me-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            Informations personnelles
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-5">
+                            <div class="text-gray-500 fs-7 mb-1">Nom</div>
+                            <div class="text-dark fw-bold fs-5">{{ user.nom }} {{ user.prenom }}</div>
+                        </div>
+
+                        <div class="mb-5">
+                            <div class="text-gray-500 fs-7 mb-1">Email</div>
+                            <div class="text-dark fw-bold fs-5">{{ user.email }}</div>
+                        </div>
+
+                        <div class="mb-5">
+                            <div class="text-gray-500 fs-7 mb-1">Métier</div>
+                            <div class="text-dark fw-bold fs-5">{{ user.metier }}</div>
+                        </div>
+
+                        {% if user.formation %}
+                            <div class="mb-5">
+                                <div class="text-gray-500 fs-7 mb-1">Formation</div>
+                                <div class="text-dark fw-bold fs-5">{{ user.formation }}</div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.specialite %}
+                            <div class="mb-5">
+                                <div class="text-gray-500 fs-7 mb-1">Spécialité</div>
+                                <div class="text-dark fw-bold fs-5">{{ user.specialite }}</div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.posteOccupe %}
+                            <div class="mb-0">
+                                <div class="text-gray-500 fs-7 mb-1">Poste occupé</div>
+                                <div class="text-dark fw-bold fs-5">{{ user.posteOccupe }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entreprise (pour les partenaires) -->
+            {% if user.refEntreprise %}
+                <div class="col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header border-0 pt-6">
+                            <h3 class="card-title">
+                                <i class="ki-duotone ki-office-bag fs-2 text-primary me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                </i>
+                                Mon Entreprise
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-5">
+                                <div class="text-gray-500 fs-7 mb-1">Nom de l'entreprise</div>
+                                <div class="text-dark fw-bold fs-5">{{ user.refEntreprise.nom }}</div>
+                            </div>
+
+                            <div class="mb-5">
+                                <div class="text-gray-500 fs-7 mb-1">Adresse</div>
+                                <div class="text-dark fw-bold fs-5">{{ user.refEntreprise.adresse }}</div>
+                            </div>
+
+                            <div class="mb-0">
+                                <div class="text-gray-500 fs-7 mb-1">Site web</div>
+                                <div class="text-dark fw-bold fs-5">
+                                    <a href="{{ user.refEntreprise.siteWeb }}" target="_blank" class="text-primary text-hover-primary">
+                                        {{ user.refEntreprise.siteWeb }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques des offres (pour les partenaires) -->
+                    {% if is_granted('ROLE_PARTENAIRE') or is_granted('ROLE_ADMIN') %}
+                        <div class="card shadow-sm mt-6">
+                            <div class="card-header border-0 pt-6">
+                                <h3 class="card-title">
+                                    <i class="ki-duotone ki-chart-simple fs-2 text-primary me-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                    Mes Offres
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-5">
+                                    <div class="text-gray-500 fs-7 mb-1">Nombre d'offres publiées</div>
+                                    <div class="text-dark fw-bold fs-4">{{ user.offres|length }}</div>
+                                </div>
+
+                                <div class="separator my-5"></div>
+
+                                <a href="{{ path('app_offre_index', {'mes_offres': '1'}) }}" class="btn btn-light-primary w-100">
+                                    <i class="ki-duotone ki-eye fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    Voir mes offres
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <!-- Établissement ou Hôpital -->
+            {% if user.refEtablissement or user.refHopital %}
+                <div class="col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header border-0 pt-6">
+                            <h3 class="card-title">
+                                <i class="ki-duotone ki-geolocation fs-2 text-primary me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Mon établissement
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            {% if user.refEtablissement %}
+                                <div class="mb-5">
+                                    <div class="text-gray-500 fs-7 mb-1">Type</div>
+                                    <div class="text-dark fw-bold fs-5">Établissement</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <div class="text-gray-500 fs-7 mb-1">Nom</div>
+                                    <div class="text-dark fw-bold fs-5">{{ user.refEtablissement.nom }}</div>
+                                </div>
+                            {% endif %}
+
+                            {% if user.refHopital %}
+                                <div class="mb-5">
+                                    <div class="text-gray-500 fs-7 mb-1">Type</div>
+                                    <div class="text-dark fw-bold fs-5">Hôpital</div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <div class="text-gray-500 fs-7 mb-1">Nom</div>
+                                    <div class="text-dark fw-bold fs-5">{{ user.refHopital.nom }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Mes candidatures (pour les étudiants) -->
+            {% if not (is_granted('ROLE_PARTENAIRE') or is_granted('ROLE_ADMIN')) %}
+                <div class="col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header border-0 pt-6">
+                            <h3 class="card-title">
+                                <i class="ki-duotone ki-send fs-2 text-primary me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Mes Candidatures
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-5">
+                                <div class="text-gray-500 fs-7 mb-1">Nombre de candidatures</div>
+                                <div class="text-dark fw-bold fs-4">{{ user.candidatures|length }}</div>
+                            </div>
+
+                            {% if user.candidatures|length > 0 %}
+                                {% set candidaturesEnAttente = 0 %}
+                                {% set candidaturesAcceptees = 0 %}
+                                {% set candidaturesRefusees = 0 %}
+
+                                {% for candidature in user.candidatures %}
+                                    {% if candidature.etat is null %}
+                                        {% set candidaturesEnAttente = candidaturesEnAttente + 1 %}
+                                    {% elseif candidature.etat %}
+                                        {% set candidaturesAcceptees = candidaturesAcceptees + 1 %}
+                                    {% else %}
+                                        {% set candidaturesRefusees = candidaturesRefusees + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-gray-600">En attente</span>
+                                    <span class="badge badge-light-warning">{{ candidaturesEnAttente }}</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-gray-600">Acceptées</span>
+                                    <span class="badge badge-light-success">{{ candidaturesAcceptees }}</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-gray-600">Refusées</span>
+                                    <span class="badge badge-light-danger">{{ candidaturesRefusees }}</span>
+                                </div>
+
+                                <div class="separator my-5"></div>
+
+                                <a href="{{ path('app_offre_index') }}" class="btn btn-light-primary w-100">
+                                    <i class="ki-duotone ki-search-list fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    Voir les offres
+                                </a>
+                            {% else %}
+                                <div class="separator my-5"></div>
+
+                                <a href="{{ path('app_offre_index') }}" class="btn btn-light-primary w-100">
+                                    <i class="ki-duotone ki-search-list fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    Découvrir les offres
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

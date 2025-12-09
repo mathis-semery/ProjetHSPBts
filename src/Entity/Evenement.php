@@ -183,11 +183,13 @@ class Evenement
     }
 
     /**
-     * Retourne le nombre d'inscriptions pour cet événement
+     * Retourne le nombre d'inscriptions confirmées pour cet événement
      */
     public function getNombreInscriptions(): int
     {
-        return $this->inscriptions->count();
+        return $this->inscriptions->filter(function(Inscription $i) {
+            return $i->isEtat() === true;
+        })->count();
     }
 
     /**

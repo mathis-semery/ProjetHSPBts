@@ -148,23 +148,26 @@
                                 {% endif %}
 
                                 <!-- Places disponibles -->
-                                {% if evenement.nombreDePlace %}
-                                    <div class="d-flex align-items-center mb-3">
-                                        <i class="ki-duotone ki-profile-user fs-2 text-warning me-2">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                            <span class="path4"></span>
-                                        </i>
-                                        <span class="text-gray-800">
-                                            {% if evenement.placesRestantes > 0 %}
-                                                {{ evenement.placesRestantes }} place(s) restante(s)
-                                            {% else %}
-                                                <span class="text-danger fw-bold">Complet</span>
-                                            {% endif %}
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="ki-duotone ki-profile-user fs-2 text-warning me-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                    <span class="text-gray-800">
+                                        <span class="badge badge-light-{{ evenement.hasPlacesDisponibles() ? 'success' : 'danger' }} fw-bold fs-6">
+                                            {{ evenement.getNombreInscriptions() }}{% if evenement.nombreDePlace is not null %}/{{ evenement.nombreDePlace }}{% else %} inscrits{% endif %}
                                         </span>
-                                    </div>
-                                {% endif %}
+                                        {% if evenement.nombreDePlace is null %}
+                                            <span class="text-muted ms-1">(illimité)</span>
+                                        {% elseif evenement.hasPlacesDisponibles() %}
+                                            <span class="text-success ms-1">({{ evenement.getPlacesRestantes() }} place(s) disponible(s))</span>
+                                        {% else %}
+                                            <span class="text-danger ms-1 fw-bold">(Complet)</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
 
                                 <!-- Description -->
                                 <p class="text-gray-700 mt-4 mb-4">
@@ -172,23 +175,49 @@
                                 </p>
 
                                 <!-- Actions -->
-                                <div class="d-flex gap-2">
-                                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="btn btn-sm btn-primary flex-grow-1">
-                                        <i class="ki-duotone ki-eye fs-2">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                        </i>
-                                        Voir détails
-                                    </a>
-                                    {% if is_granted('ROLE_ADMIN') %}
-                                        <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-light-primary">
-                                            <i class="ki-duotone ki-pencil fs-2">
+                                <div class="d-flex gap-2 flex-column">
+                                    {# Vérifier si l'utilisateur est déjà inscrit #}
+                                    {% set isRegistered = false %}
+                                    {% if app.user %}
+                                        {% for inscription in evenement.inscriptions %}
+                                            {% if inscription.refUser == app.user and inscription.etat %}
+                                                {% set isRegistered = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {# Bouton d'inscription rapide #}
+                                    {% if app.user and not isRegistered and evenement.hasPlacesDisponibles() %}
+                                        <form method="post" action="{{ path('app_evenement_register', {'id': evenement.id}) }}" class="w-100">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('register' ~ evenement.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-success w-100">
+                                                <i class="ki-duotone ki-check-circle fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                                S'inscrire
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="btn btn-sm btn-primary flex-grow-1">
+                                            <i class="ki-duotone ki-eye fs-2">
                                                 <span class="path1"></span>
                                                 <span class="path2"></span>
+                                                <span class="path3"></span>
                                             </i>
+                                            Voir détails
                                         </a>
-                                    {% endif %}
+                                        {% if is_granted('ROLE_ADMIN') %}
+                                            <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-light-primary">
+                                                <i class="ki-duotone ki-pencil fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>

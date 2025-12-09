@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Evenement;
+use App\Entity\Inscription;
 use App\Form\EvenementType;
 use App\Repository\EvenementRepository;
+use App\Repository\InscriptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,5 +79,78 @@ final class EvenementController extends AbstractController
         }
 
         return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Inscription à un événement
+     */
+    #[Route('/{id}/register', name: 'app_evenement_register', methods: ['POST'])]
+    public function register(
+        Evenement $evenement,
+        EntityManagerInterface $entityManager,
+        InscriptionRepository $inscriptionRepository
+    ): Response {
+        // Vérifier que l'utilisateur est connecté
+        $user = $this->getUser();
+        if (!$user) {
+            $this->addFlash('danger', 'Vous devez être connecté pour vous inscrire à un événement.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Vérifier que l'utilisateur n'est pas déjà inscrit
+        $inscriptionExistante = $inscriptionRepository->findByUserAndEvenement($user, $evenement);
+        if ($inscriptionExistante !== null) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit à cet événement.');
+            return $this->redirectToRoute('app_evenement_show', ['id' => $evenement->getId()]);
+        }
+
+        // Vérifier qu'il y a des places disponibles
+        if (!$evenement->hasPlacesDisponibles()) {
+            $this->addFlash('danger', 'Il n\'y a plus de places disponibles pour cet événement.');
+            return $this->redirectToRoute('app_evenement_show', ['id' => $evenement->getId()]);
+        }
+
+        // Créer l'inscription
+        $inscription = new Inscription();
+        $inscription->setRefUser($user);
+        $inscription->setRefEvenement($evenement);
+        $inscription->setEtat(true);
+        $inscription->setDate(new \DateTime());
+
+        $entityManager->persist($inscription);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Vous êtes inscrit avec succès à cet événement.');
+
+        return $this->redirectToRoute('app_evenement_show', ['id' => $evenement->getId()]);
+    }
+
+    /**
+     * Désinscription d'un événement
+     */
+    #[Route('/{id}/unregister', name: 'app_evenement_unregister', methods: ['POST'])]
+    public function unregister(
+        Evenement $evenement,
+        EntityManagerInterface $entityManager,
+        InscriptionRepository $inscriptionRepository
+    ): Response {
+        $user = $this->getUser();
+        if (!$user) {
+            $this->addFlash('danger', 'Vous devez être connecté.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        $inscription = $inscriptionRepository->findByUserAndEvenement($user, $evenement);
+        if (!$inscription) {
+            $this->addFlash('warning', 'Vous n\'êtes pas inscrit à cet événement.');
+            return $this->redirectToRoute('app_evenement_show', ['id' => $evenement->getId()]);
+        }
+
+        $entityManager->remove($inscription);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Vous avez été désinscrit de cet événement.');
+
+        return $this->redirectToRoute('app_evenement_show', ['id' => $evenement->getId()]);
     }
 }

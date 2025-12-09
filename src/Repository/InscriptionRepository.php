@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Evenement;
 use App\Entity\Inscription;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +18,46 @@ class InscriptionRepository extends ServiceEntityRepository
         parent::__construct($registry, Inscription::class);
     }
 
-//    /**
-//     * @return Inscription[] Returns an array of Inscription objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('i.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Vérifie si un utilisateur est déjà inscrit à un événement
+     */
+    public function findByUserAndEvenement(User $user, Evenement $evenement): ?Inscription
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.refUser = :user')
+            ->andWhere('i.refEvenement = :evenement')
+            ->setParameter('user', $user)
+            ->setParameter('evenement', $evenement)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
-//    public function findOneBySomeField($value): ?Inscription
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * Récupère tous les inscrits confirmés d'un événement (etat = true)
+     * @return Inscription[]
+     */
+    public function findConfirmedByEvenement(Evenement $evenement): array
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.refEvenement = :evenement')
+            ->andWhere('i.etat = true')
+            ->setParameter('evenement', $evenement)
+            ->orderBy('i.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Compte les inscrits confirmés d'un événement
+     */
+    public function countConfirmedByEvenement(Evenement $evenement): int
+    {
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->andWhere('i.refEvenement = :evenement')
+            ->andWhere('i.etat = true')
+            ->setParameter('evenement', $evenement)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

@@ -105,9 +105,13 @@ final class CandidatureController extends AbstractController
 
         // Mettre à jour l'état de la candidature
         $candidature->setEtat(true);
+
+        // Fermer l'offre : passer l'état de 1 (true) à 0 (false)
+        $offre->setEtat(false);
+
         $entityManager->flush();
 
-        $this->addFlash('success', 'La candidature a été acceptée avec succès.');
+        $this->addFlash('success', 'La candidature a été acceptée avec succès et l\'offre a été fermée au public.');
 
         return $this->redirectToRoute('app_offre_show', ['id' => $offre->getId()]);
     }

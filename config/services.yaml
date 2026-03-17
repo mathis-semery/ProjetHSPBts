@@ -21,3 +21,8 @@ services:
     App\Service\AdminBroadcastMailer:
         arguments:
             $fromAddress: '%mail_from%'
+
+    # Service d'envoi d'emails aux partenaires pour les candidatures
+    App\Service\CandidatureNotificationMailer:
+        arguments:
+            $fromAddress: '%mail_from%'

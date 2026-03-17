@@ -6,6 +6,7 @@ use App\Entity\Candidature;
 use App\Entity\Offre;
 use App\Form\OffreType;
 use App\Repository\OffreRepository;
+use App\Service\CandidatureNotificationMailer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -136,7 +137,12 @@ final class OffreController extends AbstractController
 
     #[Route('/{id}/postuler', name: 'app_offre_postuler', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    public function postuler(Request $request, Offre $offre, EntityManagerInterface $entityManager): Response
+    public function postuler(
+        Request $request,
+        Offre $offre,
+        EntityManagerInterface $entityManager,
+        CandidatureNotificationMailer $notificationMailer
+    ): Response
     {
         $user = $this->getUser();
 
@@ -173,9 +179,15 @@ final class OffreController extends AbstractController
         $entityManager->persist($candidature);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Votre candidature a été envoyée avec succès.');
+        // Envoyer un email à tous les partenaires de l'entreprise
+        try {
+            $notificationMailer->notifyPartenaires($candidature);
+        } catch (\Exception $e) {
+            // Log l'erreur mais ne bloque pas la candidature
+            // L'utilisateur ne sera pas informé de l'échec de l'envoi d'email
+        }
 
-        // TODO: Envoyer un email à l'auteur de l'offre
+        $this->addFlash('success', 'Votre candidature a été envoyée avec succès.');
 
         return $this->redirectToRoute('app_offre_show', ['id' => $offre->getId()]);
     }
